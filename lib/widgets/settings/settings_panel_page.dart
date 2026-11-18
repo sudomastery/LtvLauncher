@@ -76,6 +76,15 @@ class SettingsPanelPage extends StatelessWidget {
                   onPressed: () => Navigator.of(context).pushNamed(GeneralSettingsPage.routeName),
                 ),
                 FocusableSettingsTile(
+                  leading: const Icon(Icons.star_outline),
+                  title: Text(localizations.chooseFavoriteApps, style: Theme.of(context).textTheme.bodyMedium),
+                  onPressed: () {
+                    final apps = context.read<AppsService>();
+                    Navigator.of(context, rootNavigator: true).pop();
+                    apps.restartOnboarding();
+                  },
+                ),
+                FocusableSettingsTile(
                   leading: const Icon(Icons.speed),
                   title: Text(localizations.optimizations, style: Theme.of(context).textTheme.bodyMedium),
                   onPressed: () => Navigator.of(context).pushNamed(OptimizationsPage.routeName),

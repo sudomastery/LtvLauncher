@@ -633,6 +633,78 @@ abstract class AppLocalizations {
   /// **'Could not change the setting'**
   String get optimizationsFailed;
 
+  /// No description provided for @appForceClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Force close'**
+  String get appForceClose;
+
+  /// No description provided for @appOptimizeMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimize mode: close all other apps and open this one'**
+  String get appOptimizeMode;
+
+  /// No description provided for @appClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get appClosed;
+
+  /// No description provided for @appOptimizeDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Other apps closed'**
+  String get appOptimizeDone;
+
+  /// No description provided for @appCloseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not close (turn on Network debugging and allow it)'**
+  String get appCloseFailed;
+
+  /// No description provided for @onboardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome! Pick your most used apps'**
+  String get onboardingTitle;
+
+  /// No description provided for @onboardingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least 3. They go on your home screen. Everything else is one press of Down away.'**
+  String get onboardingSubtitle;
+
+  /// No description provided for @onboardingSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'selected'**
+  String get onboardingSelected;
+
+  /// No description provided for @onboardingNeedMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least'**
+  String get onboardingNeedMore;
+
+  /// No description provided for @onboardingDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get onboardingDone;
+
+  /// No description provided for @chooseFavoriteApps.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose favorite apps'**
+  String get chooseFavoriteApps;
+
+  /// No description provided for @minimalistMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimalist mode: only the wallpaper until you press an arrow key (hides again after 1 minute)'**
+  String get minimalistMode;
+
   /// No description provided for @wallpaperSlideshowInterval.
   ///
   /// In en, this message translates to:

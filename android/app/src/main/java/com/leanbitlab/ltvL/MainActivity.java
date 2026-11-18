@@ -197,6 +197,20 @@ public class MainActivity extends FlutterActivity {
                 case "isBreezyWeatherInstalled" -> result.success(isBreezyWeatherInstalled());
                 case "openBreezyWeather" -> result.success(openBreezyWeather());
                 case "getPackageName" -> result.success(getPackageName());
+                case "forceStopApp" -> {
+                    final String stopPackage = call.arguments();
+                    sIoExecutor.execute(() -> {
+                        final Map<String, Object> outcome = SelfAdb.forceStop(getApplicationContext(), stopPackage);
+                        runOnUiThread(() -> result.success(outcome));
+                    });
+                }
+                case "closeAllAppsExcept" -> {
+                    final String keepPackage = call.arguments();
+                    sIoExecutor.execute(() -> {
+                        final Map<String, Object> outcome = SelfAdb.closeAllExcept(getApplicationContext(), keepPackage);
+                        runOnUiThread(() -> result.success(outcome));
+                    });
+                }
                 case "isPackageEnabled" -> result.success(isPackageEnabled(call.arguments()));
                 case "setPackageEnabled" -> {
                     final String targetPackage = call.argument("packageName");

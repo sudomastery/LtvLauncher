@@ -33,6 +33,7 @@ import 'package:flauncher/providers/weather_service.dart';
 import 'package:flauncher/widgets/application_info_panel.dart';
 import 'package:flauncher/widgets/apps_grid.dart';
 import 'package:flauncher/widgets/category_row.dart';
+import 'package:flauncher/widgets/onboarding_page.dart';
 import 'package:flauncher/widgets/app_card.dart';
 import 'package:flauncher/widgets/focus_aware_app_bar.dart';
 import 'package:flauncher/widgets/settings/settings_panel_page.dart';
@@ -638,10 +639,74 @@ void main() {
     expect(find.byType(AppsGrid), findsOneWidget);
     expect(find.byKey(Key("me.efesser.other")), findsOneWidget);
   });
+
+  testWidgets("The first-run app picker covers the home screen until it is done", (tester) async {
+    final appsService = mkAppService();
+    final favorites = fakeCategory(name: "Favorites", order: 0, type: CategoryType.row);
+    final app = fakeApp(packageName: "me.efesser.fav", name: "Fav", version: "1.0.0");
+    favorites.applications.add(app);
+    when(appsService.launcherSections).thenReturn([favorites]);
+    when(appsService.onboardingActive).thenReturn(true);
+    when(appsService.onboardingChoices).thenReturn([app]);
+    when(appsService.onboardingSuggestions).thenReturn([]);
+
+    await _pumpWidgetWithProviders(tester, mkWallpaperService(), appsService, mkSettingsService(showcase: true));
+
+    expect(find.byType(OnboardingPage), findsOneWidget);
+    expect(find.text("Welcome! Pick your most used apps"), findsOneWidget);
+  });
+
+  testWidgets("Minimalist mode shows only the wallpaper until an arrow key wakes the controls", (tester) async {
+    final appsService = mkAppService();
+    final favorites = fakeCategory(name: "Favorites", order: 0, type: CategoryType.row);
+    favorites.applications.add(fakeApp(packageName: "me.efesser.fav", name: "Fav", version: "1.0.0"));
+    when(appsService.launcherSections).thenReturn([favorites]);
+
+    await _pumpWidgetWithProviders(
+        tester, mkWallpaperService(), appsService, mkSettingsService(showcase: true, minimalist: true));
+    await tester.pump();
+    final state = tester.element(find.byType(FLauncher)).read<LauncherState>();
+
+    // Hidden at first.
+    expect(state.minimalistHidden, isTrue);
+
+    // The first arrow key only wakes the controls: it opens nothing and moves nothing.
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    expect(state.minimalistHidden, isFalse);
+    expect(state.allAppsOpen, isFalse);
+
+    // From then on keys work normally: Down opens all apps in the showcase layout.
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    expect(state.allAppsOpen, isTrue);
+
+    // After a minute with no key the controls go away again and the view is back to the showcase.
+    await tester.pump(const Duration(seconds: 61));
+    expect(state.minimalistHidden, isTrue);
+    expect(state.allAppsOpen, isFalse);
+  });
+
+  testWidgets("Without minimalist mode the controls are always there and keys work straight away", (tester) async {
+    final appsService = mkAppService();
+    final favorites = fakeCategory(name: "Favorites", order: 0, type: CategoryType.row);
+    favorites.applications.add(fakeApp(packageName: "me.efesser.fav", name: "Fav", version: "1.0.0"));
+    when(appsService.launcherSections).thenReturn([favorites]);
+
+    await _pumpWidgetWithProviders(tester, mkWallpaperService(), appsService, mkSettingsService(showcase: true));
+    await tester.pump();
+    final state = tester.element(find.byType(FLauncher)).read<LauncherState>();
+
+    expect(state.minimalistHidden, isFalse);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    expect(state.allAppsOpen, isTrue);
+  });
 }
 
-SettingsService mkSettingsService({bool showcase = false}) {
+SettingsService mkSettingsService({bool showcase = false, bool minimalist = false}) {
   final settingsService = MockSettingsService();
+  when(settingsService.minimalistMode).thenReturn(minimalist);
   when(settingsService.showcaseLayout).thenReturn(showcase);
   when(settingsService.showInputShortcuts).thenReturn(true);
   when(settingsService.dateFormat).thenReturn(SettingsService.defaultDateFormat);
@@ -710,6 +775,7 @@ WeatherService mkWeatherService() {
 AppsService mkAppService() {
   final appsService = MockAppsService();
   when(appsService.initialized).thenReturn(true);
+  when(appsService.onboardingActive).thenReturn(false);
   when(appsService.getAppBanner(any)).thenAnswer((_) async => kTransparentImage);
   when(appsService.getAppIcon(any)).thenAnswer((_) async => kTransparentImage);
   when(appsService.pendingReorderFocusPackage).thenReturn(null);

@@ -137,6 +137,47 @@ void main() {
     await tester.pumpAndSettle();
     verify(appsService.uninstallApp(app));
   });
+  testWidgets("'Force close' asks AppsService to force close the app", (tester) async {
+    final appsService = MockAppsService();
+    final app = fakeApp(packageName: "com.example.video", name: "Video", version: "1.0.0");
+    when(appsService.applications).thenReturn([app]);
+    when(appsService.forceStopApplication(app)).thenAnswer((_) async => {'ok': true, 'message': ''});
+    await _pumpWidgetWithProviders(tester, appsService, null, app);
+
+    final finder = find.text("Force close");
+    await tester.ensureVisible(finder);
+    await tester.tap(finder);
+    // Not pumpAndSettle: that would wait out the whole 2 second message.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    verify(appsService.forceStopApplication(app)).called(1);
+    verifyNever(appsService.launchOptimized(any));
+    expect(find.text("Closed: Video"), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
+    expect(find.text("Closed: Video"), findsNothing);
+  });
+
+  testWidgets("'Optimize mode' closes the other apps and opens this one", (tester) async {
+    final appsService = MockAppsService();
+    final app = fakeApp(packageName: "com.example.video", name: "Video", version: "1.0.0");
+    when(appsService.applications).thenReturn([app]);
+    when(appsService.launchOptimized(app)).thenAnswer((_) async => {'ok': true, 'message': '', 'closed': ['a.b', 'c.d']});
+    await _pumpWidgetWithProviders(tester, appsService, null, app);
+
+    final finder = find.textContaining("Optimize mode");
+    await tester.ensureVisible(finder);
+    await tester.tap(finder);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    verify(appsService.launchOptimized(app)).called(1);
+    verifyNever(appsService.forceStopApplication(any));
+    expect(find.text("Other apps closed: 2"), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
+  });
 }
 
 Future<void> _pumpWidgetWithProviders(

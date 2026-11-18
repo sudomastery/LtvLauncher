@@ -15,6 +15,11 @@
 * Showcase home screen (default): the wallpaper fills the screen with one row of Favorites along the bottom. Down opens the full apps view, Back returns.
 * Default Favorites: TizenTube, Plex, Prime Video, Netflix, Spotify and Twitch appear in that order when installed, and are added later if installed later.
 * Glow is the default card theme.
+* First-run setup: a new install asks the user to pick at least 3 favorite apps (re-runnable from Settings, Choose favorite apps).
+* Minimalist mode (Settings, Interface, Miscellaneous): only the wallpaper until an arrow key is pressed; the controls hide again after a minute.
+* Four built-in wallpapers are used until the user adds pictures or picks a gradient, so a fresh install is not black.
+* Results of Force close and Optimize mode show in a small themed pill in the top right.
+* HDMI input shortcuts under the settings icons, an Optimizations menu (keep the Play Store off), and Force close and Optimize mode in the app options menu. These use the TV's own network debugging through a small allow-listed helper (`SelfAdb.java`).
 
 ### Removals
 * Firebase analytics and crashlytics services.

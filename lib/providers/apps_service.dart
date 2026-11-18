@@ -102,7 +102,7 @@ class AppsService extends ChangeNotifier {
     } else {
       await _ensureTvAppsSectionOrder();
     }
-    await _seedDefaultFavorites();
+    await _decideOnboarding();
 
     _fLauncherChannel.addAppsChangedListener((event) async {
       String? changedPackageName;
@@ -243,6 +243,112 @@ class AppsService extends ChangeNotifier {
         name: Value(data["name"]),
         version: Value(version),
         hidden: const Value.absent());
+  }
+
+  // ----- First-run onboarding: the user picks their most used apps -----
+
+  static const String _onboardingPendingKey = "onboarding_pending";
+  static const String _onboardingCompletedKey = "onboarding_completed";
+
+  /// The fewest apps a new user has to choose (fewer if the TV simply has fewer apps to offer).
+  static const int onboardingMinimumApps = 3;
+
+  bool _onboardingActive = false;
+  bool _onboardingIsRerun = false;
+
+  /// True while the "pick your most used apps" screen should be shown.
+  bool get onboardingActive => _onboardingActive;
+
+  /// True when the screen was opened again from the settings (it can then be cancelled).
+  bool get onboardingIsRerun => _onboardingIsRerun;
+
+  /// A fresh install asks the user which apps to put on the home screen instead of filling it with
+  /// everything. An install that already has its data skips the screen and keeps the default favorites.
+  Future<void> _decideOnboarding() async {
+    try {
+      final prefs = await _prefsAsync;
+      if (_database.wasCreated && prefs.getBool(_onboardingCompletedKey) != true) {
+        await prefs.setBool(_onboardingPendingKey, true);
+      }
+      _onboardingActive = prefs.getBool(_onboardingPendingKey) == true;
+    } catch (_) {
+      _onboardingActive = false;
+    }
+    if (!_onboardingActive) {
+      await _seedDefaultFavorites();
+    }
+  }
+
+  /// Apps worth offering in the picker: real apps the user opens, not the TV's own system software.
+  List<App> get onboardingChoices {
+    bool isSystemSoftware(String packageName) =>
+        packageName == 'android' ||
+        packageName.startsWith('com.tcl.') ||
+        (packageName.startsWith('com.android.') && packageName != 'com.android.vending') ||
+        packageName.startsWith('com.leanbitlab.ltvL') || // this launcher, in any of its builds
+        packageName.startsWith('com.google.android.tungsten') ||
+        packageName.startsWith('com.google.android.apps.tv.launcherx');
+
+    final choices = _applications.values
+        .where((app) => !app.hidden && !isSystemSoftware(app.packageName))
+        .toList();
+    choices.sort((a, b) {
+      if (a.sideloaded != b.sideloaded) return a.sideloaded ? 1 : -1; // TV apps first
+      return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+    });
+    return choices;
+  }
+
+  /// What starts ticked in the picker: the current favorites when it is reopened, otherwise the
+  /// well known streaming apps that are installed.
+  List<App> get onboardingSuggestions {
+    final choices = onboardingChoices;
+    if (_onboardingIsRerun) {
+      final favorites = _categoriesById.values.firstWhereOrNull((c) => c.name == 'Favorites');
+      if (favorites != null) {
+        final inFavorites = favorites.applications.map((a) => a.packageName).toList();
+        return [for (final pkg in inFavorites) ...choices.where((a) => a.packageName == pkg)];
+      }
+    }
+    return [
+      for (final pkg in defaultFavoritePackages) ...choices.where((a) => a.packageName == pkg),
+    ];
+  }
+
+  /// Saves the chosen apps, in the order given, as the Favorites row and ends the onboarding.
+  Future<void> completeOnboarding(List<App> selected) async {
+    final favorites = await getOrCreateFavoritesCategory();
+    for (final app in List<App>.from(favorites.applications)) {
+      await removeFromCategory(app, favorites);
+    }
+    for (final app in selected) {
+      await addToCategory(app, favorites, shouldNotifyListeners: false);
+    }
+    try {
+      final prefs = await _prefsAsync;
+      await prefs.setBool(_onboardingCompletedKey, true);
+      await prefs.setBool(_onboardingPendingKey, false);
+      // The user decided; do not bring the default favorites back later.
+      await prefs.setStringList(_seededFavoritesKey, defaultFavoritePackages);
+    } catch (_) {}
+    _onboardingActive = false;
+    _onboardingIsRerun = false;
+    notifyListeners();
+  }
+
+  /// Opens the picker again (from the settings) to change the favorites.
+  void restartOnboarding() {
+    _onboardingActive = true;
+    _onboardingIsRerun = true;
+    notifyListeners();
+  }
+
+  /// Closes a picker that was opened again from the settings. The very first run cannot be skipped.
+  void cancelOnboarding() {
+    if (!_onboardingIsRerun) return;
+    _onboardingActive = false;
+    _onboardingIsRerun = false;
+    notifyListeners();
   }
 
   /// Apps shown in Favorites by default, in this order, when they are installed. Apps that are not
@@ -648,6 +754,19 @@ class AppsService extends ChangeNotifier {
     }
 
     return future;
+  }
+
+  /// Force closes an app. Returns {ok, message}.
+  Future<Map<String, dynamic>> forceStopApplication(App app) =>
+      _fLauncherChannel.forceStopApp(app.packageName);
+
+  /// Optimize mode: closes every other running app, then opens [app]. Returns {ok, message, closed}.
+  Future<Map<String, dynamic>> launchOptimized(App app) async {
+    final result = await _fLauncherChannel.closeAllAppsExcept(app.packageName);
+    if (result['ok'] == true) {
+      await launchApp(app);
+    }
+    return result;
   }
 
   Future<void> openAppInfo(App app) =>

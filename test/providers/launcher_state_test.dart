@@ -17,6 +17,7 @@ void main() {
 
     setUp(() {
       mockAppsService = MockAppsService();
+      when(mockAppsService.onboardingActive).thenReturn(false);
       mockSettingsService = MockSettingsService();
       launcherState = LauncherState();
     });
@@ -126,6 +127,79 @@ void main() {
       launcherState.toggleLauncherVisibility();
 
       expect(listenersNotified, isTrue);
+    });
+  });
+
+  group('LauncherState minimalist mode', () {
+    testWidgets('starts hidden when switched on and shows everything when switched off', (tester) async {
+      final state = LauncherState();
+      expect(state.minimalistHidden, isFalse);
+
+      state.setMinimalistActive(true);
+      expect(state.minimalistHidden, isTrue);
+
+      state.setMinimalistActive(false);
+      expect(state.minimalistHidden, isFalse);
+      state.dispose();
+    });
+
+    testWidgets('revealed controls hide again after one minute without a key press', (tester) async {
+      final state = LauncherState();
+      state.setMinimalistActive(true);
+
+      state.revealMinimalist();
+      expect(state.minimalistHidden, isFalse);
+
+      await tester.pump(const Duration(seconds: 59));
+      expect(state.minimalistHidden, isFalse);
+
+      await tester.pump(const Duration(seconds: 2));
+      expect(state.minimalistHidden, isTrue);
+      state.dispose();
+    });
+
+    testWidgets('every key press restarts the one minute countdown', (tester) async {
+      final state = LauncherState();
+      state.setMinimalistActive(true);
+      state.revealMinimalist();
+
+      await tester.pump(const Duration(seconds: 40));
+      state.bumpMinimalistActivity();
+      await tester.pump(const Duration(seconds: 40));
+      expect(state.minimalistHidden, isFalse); // 80 s since the reveal, but only 40 s since the last key
+
+      await tester.pump(const Duration(seconds: 25));
+      expect(state.minimalistHidden, isTrue);
+      state.dispose();
+    });
+
+    testWidgets('does not hide while a panel is open on top, and hides once it is closed', (tester) async {
+      final state = LauncherState();
+      var somethingOnTop = true;
+      state.minimalistCanHide = () => !somethingOnTop;
+      state.setMinimalistActive(true);
+      state.revealMinimalist();
+
+      await tester.pump(const Duration(seconds: 61));
+      expect(state.minimalistHidden, isFalse);
+
+      somethingOnTop = false;
+      await tester.pump(const Duration(seconds: 61));
+      expect(state.minimalistHidden, isTrue);
+      state.dispose();
+    });
+
+    testWidgets('going back to the bare wallpaper also closes the all apps view', (tester) async {
+      final state = LauncherState();
+      state.setMinimalistActive(true);
+      state.revealMinimalist();
+      state.setAllAppsOpen(true);
+
+      await tester.pump(const Duration(seconds: 61));
+
+      expect(state.minimalistHidden, isTrue);
+      expect(state.allAppsOpen, isFalse);
+      state.dispose();
     });
   });
 }

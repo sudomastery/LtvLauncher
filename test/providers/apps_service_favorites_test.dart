@@ -28,7 +28,8 @@ void main() {
   late MockFLauncherChannel channel;
 
   setUp(() {
-    SharedPreferences.setMockInitialValues({});
+    // These tests are about the default favorites, so skip the first-run picker (see the onboarding tests below).
+    SharedPreferences.setMockInitialValues({'onboarding_completed': true});
     database = FLauncherDatabase.inMemory();
     channel = MockFLauncherChannel();
     when(channel.getApplicationIcon(any)).thenAnswer((_) async => Uint8List(0));
@@ -80,6 +81,77 @@ void main() {
 
     final stored = await database.getCategories();
     expect(stored.firstWhere((c) => c.name == 'Favorites').rowHeight, 90);
+  });
+
+  group('first-run onboarding', () {
+    setUp(() => SharedPreferences.setMockInitialValues({}));
+
+    test('a fresh install asks the user and starts with an empty Favorites row', () async {
+      final service = await start([
+        _app('io.gh.reisxd.tizentube.cobalt', 'TizenTube'),
+        _app('com.spotify.tv.android', 'Spotify'),
+        _app('com.example.other', 'Other'),
+      ]);
+
+      expect(service.onboardingActive, isTrue);
+      expect(favorites(service).applications, isEmpty);
+      // The well known apps are suggested, the rest can still be picked.
+      expect(service.onboardingSuggestions.map((a) => a.packageName),
+          ['io.gh.reisxd.tizentube.cobalt', 'com.spotify.tv.android']);
+      expect(service.onboardingChoices.map((a) => a.packageName), contains('com.example.other'));
+    });
+
+    test('the TV system software is not offered as a choice', () async {
+      final service = await start([
+        _app('com.tcl.tv', 'TV'),
+        _app('com.android.tv.settings', 'TV Settings'),
+        _app('com.android.vending', 'Play Store'),
+        _app('com.leanbitlab.ltvL.fork', 'LTvLauncher Enhanced'),
+        _app('com.example.player', 'Player'),
+      ]);
+
+      final offered = service.onboardingChoices.map((a) => a.packageName).toList();
+      expect(offered, containsAll(['com.android.vending', 'com.example.player']));
+      expect(offered, isNot(contains('com.tcl.tv')));
+      expect(offered, isNot(contains('com.android.tv.settings')));
+      expect(offered, isNot(contains('com.leanbitlab.ltvL.fork')));
+    });
+
+    test('completing it makes the chosen apps the Favorites row, in order, and ends the onboarding', () async {
+      final service = await start([
+        _app('io.gh.reisxd.tizentube.cobalt', 'TizenTube'),
+        _app('com.spotify.tv.android', 'Spotify'),
+        _app('com.example.other', 'Other'),
+      ]);
+      final byPackage = {for (final a in service.applications) a.packageName: a};
+
+      await service.completeOnboarding([byPackage['com.example.other']!, byPackage['com.spotify.tv.android']!]);
+
+      expect(service.onboardingActive, isFalse);
+      expect(favorites(service).applications.map((a) => a.packageName), ['com.example.other', 'com.spotify.tv.android']);
+    });
+
+    test('choosing again from the settings replaces the old favorites and can be cancelled', () async {
+      final service = await start([
+        _app('io.gh.reisxd.tizentube.cobalt', 'TizenTube'),
+        _app('com.spotify.tv.android', 'Spotify'),
+        _app('com.example.other', 'Other'),
+      ]);
+      final byPackage = {for (final a in service.applications) a.packageName: a};
+      await service.completeOnboarding([byPackage['io.gh.reisxd.tizentube.cobalt']!]);
+
+      service.restartOnboarding();
+      expect(service.onboardingActive, isTrue);
+      expect(service.onboardingSuggestions.map((a) => a.packageName), ['io.gh.reisxd.tizentube.cobalt']);
+
+      service.cancelOnboarding();
+      expect(service.onboardingActive, isFalse);
+      expect(favorites(service).applications.map((a) => a.packageName), ['io.gh.reisxd.tizentube.cobalt']);
+
+      service.restartOnboarding();
+      await service.completeOnboarding([byPackage['com.example.other']!]);
+      expect(favorites(service).applications.map((a) => a.packageName), ['com.example.other']);
+    });
   });
 
   test('default favorites list covers the six apps from the old home screen', () {

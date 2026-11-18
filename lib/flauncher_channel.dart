@@ -55,6 +55,18 @@ class FLauncherChannel {
     }
   }
 
+  /// Force closes one app. Returns {ok: bool, message: String}.
+  Future<Map<String, dynamic>> forceStopApp(String packageName) async {
+    final result = await _methodChannel.invokeMapMethod<String, dynamic>('forceStopApp', packageName);
+    return result ?? {'ok': false, 'message': 'No answer from the system.'};
+  }
+
+  /// Optimize mode: force closes every other running app. Returns {ok, message, closed: List<String>}.
+  Future<Map<String, dynamic>> closeAllAppsExcept(String packageName) async {
+    final result = await _methodChannel.invokeMapMethod<String, dynamic>('closeAllAppsExcept', packageName);
+    return result ?? {'ok': false, 'message': 'No answer from the system.', 'closed': <String>[]};
+  }
+
   /// True when the package is installed and enabled.
   Future<bool> isPackageEnabled(String packageName) async =>
       await _methodChannel.invokeMethod<bool>('isPackageEnabled', packageName) ?? false;

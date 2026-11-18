@@ -47,6 +47,7 @@ void main() {
       when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowMinutes).thenReturn(15);
+      when(settingsService.gradientUuid).thenReturn(null);
       when(imagePicker.pickImage(source: ImageSource.gallery)).thenAnswer((_) => Future.value(pickedFile));
       when(fLauncherChannel.checkForGetContentAvailability()).thenAnswer((_) => Future.value(true));
       final wallpaperService = WallpaperService(fLauncherChannel, settingsService);
@@ -67,6 +68,7 @@ void main() {
       when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowMinutes).thenReturn(15);
+      when(settingsService.gradientUuid).thenReturn(null);
       final wallpaperService = WallpaperService(fLauncherChannel, settingsService);
       await untilCalled(pathProviderPlatform.getApplicationDocumentsPath());
 
@@ -81,6 +83,7 @@ void main() {
       when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowMinutes).thenReturn(15);
+      when(settingsService.gradientUuid).thenReturn(null);
     final wallpaperService = WallpaperService(fLauncherChannel, settingsService);
 
     await untilCalled(pathProviderPlatform.getApplicationDocumentsPath());
@@ -97,6 +100,7 @@ void main() {
       when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowMinutes).thenReturn(15);
+      when(settingsService.gradientUuid).thenReturn(null);
       final wallpaperService = WallpaperService(fLauncherChannel, settingsService);
       when(settingsService.gradientUuid).thenReturn(null);
 
@@ -112,6 +116,7 @@ void main() {
       when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowEnabled).thenReturn(false);
       when(settingsService.wallpaperSlideshowMinutes).thenReturn(15);
+      when(settingsService.gradientUuid).thenReturn(null);
       final wallpaperService = WallpaperService(fLauncherChannel, settingsService);
       when(settingsService.gradientUuid).thenReturn(FLauncherGradients.grassShampoo.uuid);
       await untilCalled(pathProviderPlatform.getApplicationDocumentsPath());

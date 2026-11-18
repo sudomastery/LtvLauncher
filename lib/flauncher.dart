@@ -27,6 +27,7 @@ import 'package:flauncher/widgets/category_row.dart';
 import 'package:flauncher/widgets/launcher_alternative_view.dart';
 import 'package:flauncher/widgets/focus_aware_app_bar.dart';
 import 'package:flauncher/widgets/input_shortcuts.dart';
+import 'package:flauncher/widgets/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -44,8 +45,83 @@ class FLauncher extends StatefulWidget {
   State<FLauncher> createState() => _FLauncherState();
 }
 
-class _FLauncherState extends State<FLauncher> {
+class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   final GlobalKey<FocusAwareAppBarState> _appBarKey = GlobalKey();
+  bool _lastMinimalist = false;
+  // Kept from initState: looking things up through the context is not allowed in dispose().
+  late final SettingsService _settings;
+  late final LauncherState _launcherState;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    FocusManager.instance.addEarlyKeyEventHandler(_onEarlyKey);
+    _settings = context.read<SettingsService>();
+    _launcherState = context.read<LauncherState>();
+    _settings.addListener(_syncMinimalist);
+    // The controls only hide while nothing (a panel, a dialog) is open on top of the home screen.
+    _launcherState.minimalistCanHide = () => mounted && (ModalRoute.of(context)?.isCurrent ?? true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _syncMinimalist(force: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    FocusManager.instance.removeEarlyKeyEventHandler(_onEarlyKey);
+    _settings.removeListener(_syncMinimalist);
+    _launcherState.minimalistCanHide = () => true;
+    super.dispose();
+  }
+
+  void _syncMinimalist({bool force = false}) {
+    if (!mounted) return;
+    final enabled = context.read<SettingsService>().minimalistMode;
+    if (force || enabled != _lastMinimalist) {
+      _lastMinimalist = enabled;
+      context.read<LauncherState>().setMinimalistActive(enabled);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Back from another app: start again from the bare wallpaper.
+    if (state == AppLifecycleState.resumed && mounted && context.read<SettingsService>().minimalistMode) {
+      context.read<LauncherState>().setMinimalistActive(true);
+    }
+  }
+
+  static final _wakeKeys = {
+    LogicalKeyboardKey.arrowUp,
+    LogicalKeyboardKey.arrowDown,
+    LogicalKeyboardKey.arrowLeft,
+    LogicalKeyboardKey.arrowRight,
+    LogicalKeyboardKey.select,
+    LogicalKeyboardKey.enter,
+    LogicalKeyboardKey.numpadEnter,
+  };
+
+  /// Runs before the buttons see a key. In minimalist mode the first arrow or select press only brings the
+  /// controls back, so nothing is moved or launched while it is invisible.
+  KeyEventResult _onEarlyKey(KeyEvent event) {
+    if (!mounted) return KeyEventResult.ignored;
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) return KeyEventResult.ignored;
+    if (!context.read<SettingsService>().minimalistMode) return KeyEventResult.ignored;
+    if (!(ModalRoute.of(context)?.isCurrent ?? true)) return KeyEventResult.ignored;
+
+    final launcher = context.read<LauncherState>();
+    if (launcher.minimalistHidden) {
+      if (_wakeKeys.contains(event.logicalKey)) {
+        launcher.revealMinimalist();
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    }
+    launcher.bumpMinimalistActivity();
+    return KeyEventResult.ignored;
+  }
 
   @override
   Widget build(BuildContext context) => Actions(
@@ -60,7 +136,9 @@ class _FLauncherState extends State<FLauncher> {
         children: [
           RepaintBoundary(
             child: Consumer<WallpaperService>(
-              builder: (ctx, wallpaperService, __) => _wallpaper(ctx, wallpaperService, showcase: _showcaseActive(ctx))
+              builder: (ctx, wallpaperService, __) => _wallpaper(ctx, wallpaperService,
+                  showcase: _showcaseActive(ctx),
+                  bare: ctx.select<LauncherState, bool>((state) => state.minimalistHidden))
             ),
           ),
           Consumer<LauncherState>(
@@ -71,7 +149,7 @@ class _FLauncherState extends State<FLauncher> {
               ),
               visible: state.launcherVisible
             ),
-            child: Scaffold(
+            child: _MinimalistFade(child: Scaffold(
               backgroundColor: Colors.transparent,
               appBar: FocusAwareAppBar(key: _appBarKey),
               body: Column(
@@ -124,8 +202,14 @@ class _FLauncherState extends State<FLauncher> {
                   ),
                 ],
               )
-            )
-          )
+            ))
+          ),
+          // First run (or "Choose favorite apps" in the settings): pick the apps for the home screen.
+          Consumer<AppsService>(
+            builder: (_, apps, __) => apps.initialized && apps.onboardingActive
+                ? const OnboardingPage()
+                : const SizedBox.shrink(),
+          ),
         ]
       )
     ),
@@ -243,7 +327,7 @@ class _FLauncherState extends State<FLauncher> {
     return Column(children: children);
   }
 
-  Widget _wallpaper(BuildContext context, WallpaperService wallpaperService, {bool showcase = false}) {
+  Widget _wallpaper(BuildContext context, WallpaperService wallpaperService, {bool showcase = false, bool bare = false}) {
     Widget background;
     if (wallpaperService.wallpaper != null) {
       final physicalSize = MediaQuery.sizeOf(context);
@@ -267,7 +351,11 @@ class _FLauncherState extends State<FLauncher> {
       fit: StackFit.expand,
       children: [
         background,
-        DecoratedBox(
+        // In minimalist mode, with the controls hidden, the picture is shown as it is, without the dimming.
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 400),
+          opacity: bare ? 0.0 : 1.0,
+          child: DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -289,6 +377,7 @@ class _FLauncherState extends State<FLauncher> {
             ),
           ),
         ),
+        ),
       ],
     );
   }
@@ -305,6 +394,23 @@ class _FLauncherState extends State<FLauncher> {
           Text(localizations.loading, style: Theme.of(context).textTheme.titleLarge),
         ],
       ),
+    );
+  }
+}
+
+/// Fades the controls out (and stops them taking touches) while minimalist mode has them hidden.
+class _MinimalistFade extends StatelessWidget {
+  final Widget child;
+
+  const _MinimalistFade({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final hidden = context.select<LauncherState, bool>((state) => state.minimalistHidden);
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 400),
+      opacity: hidden ? 0.0 : 1.0,
+      child: IgnorePointer(ignoring: hidden, child: child),
     );
   }
 }

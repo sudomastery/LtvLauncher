@@ -48,6 +48,12 @@ class MiscPanelPage extends StatelessWidget {
                 secondary: const Icon(Icons.wallpaper),
               ),
               RoundedSwitchListTile(
+                value: settingsService.minimalistMode,
+                onChanged: (value) => settingsService.setMinimalistMode(value),
+                title: Text(localizations.minimalistMode, style: Theme.of(context).textTheme.bodyMedium),
+                secondary: const Icon(Icons.visibility_off_outlined),
+              ),
+              RoundedSwitchListTile(
                 value: settingsService.showInputShortcuts,
                 onChanged: (value) => settingsService.setShowInputShortcuts(value),
                 title: Text(localizations.showInputShortcuts, style: Theme.of(context).textTheme.bodyMedium),

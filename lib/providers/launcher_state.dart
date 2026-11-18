@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+
 import 'package:flauncher/providers/settings_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -45,7 +47,71 @@ class LauncherState extends ChangeNotifier
     notifyListeners();
   }
 
-  LauncherState() : _isDefaultLauncher = false, _launcherVisible = true;
+  /// How long the controls stay on screen in minimalist mode after the last key press.
+  final Duration minimalistHideAfter;
+
+  LauncherState({this.minimalistHideAfter = const Duration(minutes: 1)})
+      : _isDefaultLauncher = false, _launcherVisible = true;
+
+  // ----- Minimalist mode: only the wallpaper until a key is pressed -----
+
+  bool _minimalistHidden = false;
+  Timer? _minimalistTimer;
+
+  /// Lets the home screen postpone hiding while a dialog or panel is open on top of it.
+  bool Function() minimalistCanHide = () => true;
+
+  /// True while the controls are hidden and only the wallpaper shows.
+  bool get minimalistHidden => _minimalistHidden;
+
+  /// Turns the behaviour on (starts with the controls hidden) or off (controls always shown).
+  void setMinimalistActive(bool active) {
+    _minimalistTimer?.cancel();
+    if (active) {
+      hideMinimalistNow(force: true);
+    } else if (_minimalistHidden) {
+      _minimalistHidden = false;
+      notifyListeners();
+    }
+  }
+
+  /// Hides the controls, unless something is open on top of them (then it tries again a minute later).
+  void hideMinimalistNow({bool force = false}) {
+    _minimalistTimer?.cancel();
+    if (!force && !minimalistCanHide()) {
+      _scheduleMinimalistHide();
+      return;
+    }
+    _allAppsOpen = false;
+    if (!_minimalistHidden) {
+      _minimalistHidden = true;
+    }
+    notifyListeners();
+  }
+
+  /// Shows the controls and starts the countdown to hide them again.
+  void revealMinimalist() {
+    final changed = _minimalistHidden;
+    _minimalistHidden = false;
+    _scheduleMinimalistHide();
+    if (changed) notifyListeners();
+  }
+
+  /// Any key press while the controls are showing restarts the countdown.
+  void bumpMinimalistActivity() {
+    if (!_minimalistHidden) _scheduleMinimalistHide();
+  }
+
+  void _scheduleMinimalistHide() {
+    _minimalistTimer?.cancel();
+    _minimalistTimer = Timer(minimalistHideAfter, () => hideMinimalistNow());
+  }
+
+  @override
+  void dispose() {
+    _minimalistTimer?.cancel();
+    super.dispose();
+  }
 
   void toggleLauncherVisibility() {
     _launcherVisible = !_launcherVisible;
@@ -64,6 +130,11 @@ class LauncherState extends ChangeNotifier
   void handleBackNavigation(BuildContext context) {
     if (_allAppsOpen) {
       setAllAppsOpen(false);
+      return;
+    }
+    final apps = context.read<AppsService>();
+    if (apps.onboardingActive) {
+      apps.cancelOnboarding();
       return;
     }
     if (_suppressBackUntil != null && DateTime.now().isBefore(_suppressBackUntil!)) {

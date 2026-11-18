@@ -27,16 +27,28 @@ Screenshots use wallpapers generated for this README.
 | | LTvLauncher (original) | LTvLauncher Enhanced |
 |---|---|---|
 | **Home screen** | Rows and grids of apps fill the screen; the wallpaper is mostly hidden | **Showcase layout**: the wallpaper fills the screen with one row of favorites along the bottom. Down opens all apps, Back returns |
-| **Wallpaper** | One picture, or one day and one night picture | **Slideshow** from a folder of your pictures, with a crossfade and a choice of interval (1 minute to 24 hours) |
+| **Wallpaper** | One picture, or one day and one night picture; plain black until you set one | **Slideshow** from a folder of your pictures with a crossfade and a choice of interval (1 minute to 24 hours), and **built-in wallpapers** so a fresh install is never black |
 | **Wallpaper memory** | Picture decoded at its full size | Decoded at the **screen width**, so a 4K picture costs no more than a 720p one |
 | **Wallpaper timers** | n/a | Slideshow **pauses while another app is in front** (no timer, no decoding) |
+| **First run** | Everything is dumped on the home screen | A **welcome screen** asks you to pick at least 3 favorite apps first, so the home screen only has what you use |
 | **Favorites** | Empty until you add apps | **Prefilled** with TizenTube, Plex, Prime Video, Netflix, Spotify and Twitch, only those you have installed |
 | **HDMI inputs** | A TV icon that opens a list | Small **rounded HDMI chips** under the settings icons, one press to switch, using your TV's own input names |
 | **Card style** | Default theme with small corner radius; the highlight only appears after the first key press | **Rounded Glow cards** by default, highlight visible from the first moment |
+| **App options (long press)** | Add, open, hide, remove, uninstall | Adds **Force close** and **Optimize mode** (close every other running app, then open this one) |
 | **Play Store** | Always running in the background | **Optimizations menu** with a switch to keep it off and back on in about three seconds |
 | **Branding** | Purple logo | **Orange logo and banner**, installs as a separate app next to the original |
+| **Minimalist mode** | n/a | Optional: only the wallpaper shows, the controls appear on an arrow key press and fade away after a minute |
+| **Messages** | n/a | Small themed pill in the top right that fades after 2 seconds |
 | **Donate menu** | Support and Donate entry with QR codes | Removed (and the QR code library with it) |
 | **Tests** | Existing suite | Existing suite plus new tests for the slideshow, showcase layout, favorites, HDMI chips and Optimizations |
+
+## First-run setup
+
+A new install does not fill the home screen with every app on the TV. It opens a welcome screen where you pick your most used apps (at least 3). The well known streaming apps you have installed start ticked, you can untick or add others, and **Done** stays greyed out until you have chosen enough. Your choice becomes the Favorites row, in the order you picked. You can run it again any time from Settings, **Choose favorite apps**.
+
+<p align="center">
+  <img src="docs/enhanced/onboarding.jpg" alt="First-run screen asking the user to pick their most used apps" width="620">
+</p>
 
 ## Revamped UI
 
@@ -47,6 +59,9 @@ The wallpaper fills the screen and your favorite apps sit in a single row along 
   <img src="docs/enhanced/focus.jpg" alt="A focused app card with a soft glow" width="420">
   <img src="docs/enhanced/all-apps.jpg" alt="The full apps view opened with Down" width="420">
 </p>
+
+### Minimalist mode
+An optional mode for people who want nothing but the picture. Only the wallpaper (undimmed) is shown. Press an arrow key or Select and the controls fade in; the first press only wakes them, so nothing is moved or launched by accident. After a minute without a key press they fade away again. Switch it on in Settings, Interface, Miscellaneous.
 
 ### Rounded Glow cards
 App cards are rounded and glow in the accent color when focused. The focus highlight is visible from the first moment, so you always know where you are before touching the remote. Six cards fit in the row on a 1280x720 interface.
@@ -59,7 +74,7 @@ Small rounded chips under the settings icons switch the TV straight to HDMI 1, H
 </p>
 
 ### Wallpaper slideshow
-Copy pictures into the launcher's wallpaper folder and they rotate on the home screen with a soft crossfade. Choose how often the picture changes: every 1, 5, 15, 30 or 60 minutes, or every 3, 12 or 24 hours (15 minutes by default). Press the folder entry in the settings to rescan after adding pictures.
+Copy pictures into the launcher's wallpaper folder and they rotate on the home screen with a soft crossfade. Choose how often the picture changes: every 1, 5, 15, 30 or 60 minutes, or every 3, 12 or 24 hours (15 minutes by default). Press the folder entry in the settings to rescan after adding pictures. Until you add pictures (or pick a gradient or a single picture yourself) four built-in wallpapers rotate instead, so a fresh install is never plain black.
 
 <p align="center">
   <img src="docs/enhanced/wallpaper-slideshow.jpg" alt="Wallpaper slideshow settings" width="420">
@@ -90,12 +105,24 @@ For low-RAM TVs. Right now it has one switch: **keep the Play Store switched off
   <img src="docs/enhanced/optimizations.jpg" alt="Optimizations menu with the Play Store switch" width="420">
 </p>
 
-How it works, honestly: Android does not let a normal app disable another app. This launcher talks to the TV's own **Network debugging** service on `127.0.0.1:5555`, the same way a computer running `adb shell pm disable-user` would. That means:
+### Force close and Optimize mode
+Hold an app to open its options and you get two new entries:
+
+- **Force close** stops that app straight away.
+- **Optimize mode** closes every other app that is running and then opens the one you chose, so a heavy app like Spotify or Netflix gets the whole 1 GB to itself.
+
+On the test TV, Optimize mode on TizenTube closed the already running Netflix and Spotify and left only TizenTube, and Force close on TizenTube raised available memory from about 317 MB to 410 MB. Results appear as a small dark pill in the top right corner that fades after two seconds. Both use the same network debugging connection as the Play Store switch (see below), so they need the same one-time approval. The launcher never closes itself, the TV's own system software (`com.tcl.*`, `com.android.*`, Google Play services) or anything without a launcher icon.
+
+<p align="center">
+  <img src="docs/enhanced/app-options.jpg" alt="Options menu for an app with Optimize mode and Force close" width="240">
+</p>
+
+How it works, honestly: Android does not let a normal app disable or stop another app. This launcher talks to the TV's own **Network debugging** service on `127.0.0.1:5555`, the same way a computer running `adb shell pm disable-user` would. That means:
 
 - Network debugging must be turned on in Developer options.
 - The first time, the TV asks "Allow USB debugging?" for the launcher's key. Choose **Always allow**.
 - The app now declares the `INTERNET` permission (the original has none). It is needed because Android treats even connections to the device itself as network access. The code only ever connects to `127.0.0.1`.
-- Only an allow list of apps can be switched (currently only `com.android.vending`), and only two fixed commands are ever sent: `pm disable-user --user 0 <package>` and `pm enable --user 0 <package>`. See [`SelfAdb.java`](android/app/src/main/java/com/leanbitlab/ltvL/SelfAdb.java).
+- Only a short list of fixed commands is ever sent, and nothing else can be run through the launcher: `pm disable-user --user 0 <package>` and `pm enable --user 0 <package>` (allow list: the Play Store only), `am force-stop <package>` (only for apps that have a launcher icon and are not protected), and `ps -A -o NAME` to see what is running. See [`SelfAdb.java`](android/app/src/main/java/com/leanbitlab/ltvL/SelfAdb.java).
 - To undo it from a computer: `adb shell pm enable com.android.vending`.
 
 ### Measured performance
@@ -114,7 +141,7 @@ For comparison, on the same TV Projectivy Launcher used roughly 39% of one core 
 ## Every other change
 
 - **Bug fix**: creating a category through `addCategory` saved only its name and position, so its row height, layout type, sort order and column count were lost on restart. They are now stored.
-- **Tests**: new tests for the wallpaper slideshow, showcase layout, default favorites, HDMI chips and the Optimizations page. Existing tests were updated for the new settings and names.
+- **Tests**: new tests for the wallpaper slideshow and built-in wallpapers, showcase layout, minimalist mode, the first-run picker, default favorites, HDMI chips, the Optimizations page, the new app options and the message pill. Existing tests were updated for the new settings and names.
 - **Dependencies**: `dadb` added (ADB client for the Optimizations menu); `qr_flutter` removed along with the Donate dialog.
 - **Settings**: new switches for the showcase layout and the HDMI shortcuts, a slideshow switch and interval, and the Optimizations page. All new text is in the English strings and falls back to English in the other languages until translated.
 - **Build**: the `.fork` application id suffix is the default, with an override. APKs are named `LTvLauncher-Enhanced-<abi>`.

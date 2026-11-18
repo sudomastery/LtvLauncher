@@ -46,6 +46,7 @@ const String _screensaverClockStyleKey = "screensaver_clock_style";
 const String _screensaverAnimationStyleKey = "screensaver_animation_style";
 const String _timeBasedWallpaperEnabledKey = "time_based_wallpaper_enabled";
 const String _showInputShortcutsKey = "show_input_shortcuts";
+const String _minimalistModeKey = "minimalist_mode";
 const String _showcaseLayoutKey = "showcase_layout";
 const String _wallpaperSlideshowEnabledKey = "wallpaper_slideshow_enabled";
 const String _wallpaperSlideshowMinutesKey = "wallpaper_slideshow_minutes";
@@ -127,6 +128,7 @@ class SettingsService extends ChangeNotifier {
   late String _screensaverAnimationStyle;
   late bool _timeBasedWallpaperEnabled;
   late bool _showInputShortcuts;
+  late bool _minimalistMode;
   late bool _showcaseLayout;
   late bool _wallpaperSlideshowEnabled;
   late int _wallpaperSlideshowMinutes;
@@ -255,6 +257,7 @@ class SettingsService extends ChangeNotifier {
     _screensaverAnimationStyle = _sharedPreferences.getString(_screensaverAnimationStyleKey) ?? SCREENSAVER_ANIMATION_BOUNCE;
     _timeBasedWallpaperEnabled = _sharedPreferences.getBool(_timeBasedWallpaperEnabledKey) ?? false;
     _showInputShortcuts = _sharedPreferences.getBool(_showInputShortcutsKey) ?? true;
+    _minimalistMode = _sharedPreferences.getBool(_minimalistModeKey) ?? false;
     _showcaseLayout = _sharedPreferences.getBool(_showcaseLayoutKey) ?? true;
     _wallpaperSlideshowEnabled = _sharedPreferences.getBool(_wallpaperSlideshowEnabledKey) ?? true;
     _wallpaperSlideshowMinutes = _sharedPreferences.getInt(_wallpaperSlideshowMinutesKey) ?? 15;
@@ -306,6 +309,7 @@ class SettingsService extends ChangeNotifier {
       _screensaverAnimationStyleKey: _screensaverAnimationStyle,
       _timeBasedWallpaperEnabledKey: _timeBasedWallpaperEnabled,
       _showInputShortcutsKey: _showInputShortcuts,
+      _minimalistModeKey: _minimalistMode,
       _showcaseLayoutKey: _showcaseLayout,
       _wallpaperSlideshowEnabledKey: _wallpaperSlideshowEnabled,
       _wallpaperSlideshowMinutesKey: _wallpaperSlideshowMinutes,
@@ -485,6 +489,15 @@ class SettingsService extends ChangeNotifier {
   Future<void> setShowInputShortcuts(bool show) async {
     await _sharedPreferences.setBool(_showInputShortcutsKey, show);
     _showInputShortcuts = show;
+    notifyListeners();
+  }
+
+  /// Only the wallpaper is shown; the controls appear on a directional key press and hide again after a minute.
+  bool get minimalistMode => _minimalistMode;
+
+  Future<void> setMinimalistMode(bool enabled) async {
+    await _sharedPreferences.setBool(_minimalistModeKey, enabled);
+    _minimalistMode = enabled;
     notifyListeners();
   }
 

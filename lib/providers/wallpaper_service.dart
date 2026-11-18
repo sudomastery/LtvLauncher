@@ -40,6 +40,14 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
   // Slideshow: pictures are read from <app external files dir>/wallpapers.
   static const _slideshowFolderName = "wallpapers";
   static const _imageExtensions = {".jpg", ".jpeg", ".png", ".webp"};
+  /// Built-in wallpapers, shown when the user has not added pictures or chosen a gradient or picture.
+  static const _defaultAssets = [
+    'assets/wallpapers/aurora.jpg',
+    'assets/wallpapers/ocean.jpg',
+    'assets/wallpapers/sunset.jpg',
+    'assets/wallpapers/ember.jpg',
+  ];
+  int _defaultIndex = -1;
   Directory? _slideshowDirectory;
   List<File> _slideshowFiles = [];
   int _slideshowIndex = -1;
@@ -140,6 +148,34 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
+  ImageProvider _assetProvider(String path) {
+    return _providers.putIfAbsent(
+      path,
+      () => ResizeImage(AssetImage(path), width: _decodeWidth, allowUpscaling: false),
+    );
+  }
+
+  /// The built-in wallpapers are used only while the user has not picked anything of their own.
+  Future<bool> _defaultsAllowed() async {
+    if (_settingsService.gradientUuid != null) return false; // an explicit gradient choice wins
+    if (await _wallpaperFile.exists()) return false;
+    return true;
+  }
+
+  Future<void> _advanceDefault() async {
+    final previous = _defaultIndex >= 0 ? _defaultAssets[_defaultIndex] : null;
+    _defaultIndex = (_defaultIndex + 1) % _defaultAssets.length;
+    final provider = _assetProvider(_defaultAssets[_defaultIndex]);
+    await _preload(provider);
+    _lastSlideshowChange = DateTime.now();
+    _wallpaper = provider;
+    _version++;
+    notifyListeners();
+    if (previous != null && previous != _defaultAssets[_defaultIndex]) {
+      await _providers.remove(previous)?.evict();
+    }
+  }
+
   Future<void> _forget(File file) async {
     final old = _providers.remove(file.path);
     await old?.evict();
@@ -213,7 +249,17 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
     }
     await _refreshSlideshowFiles();
     if (_slideshowFiles.isEmpty) {
-      await _updateWallpaper(force: true);
+      if (!await _defaultsAllowed()) {
+        await _updateWallpaper(force: true);
+        return;
+      }
+      // Nothing of the user's yet: rotate the built-in wallpapers on the same timer.
+      _slideshowActive = true;
+      _slideshowTimer = Timer.periodic(
+        Duration(minutes: _settingsService.wallpaperSlideshowMinutes),
+        (_) => _advanceSlideshow(),
+      );
+      if (advanceNow || _wallpaper == null) await _advanceDefault();
       return;
     }
     _slideshowActive = true;
@@ -227,7 +273,10 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _advanceSlideshow() async {
-    if (_slideshowFiles.isEmpty) return;
+    if (_slideshowFiles.isEmpty) {
+      if (await _defaultsAllowed()) await _advanceDefault();
+      return;
+    }
     final previous = _slideshowIndex >= 0 && _slideshowIndex < _slideshowFiles.length ? _slideshowFiles[_slideshowIndex] : null;
     _slideshowIndex = (_slideshowIndex + 1) % _slideshowFiles.length;
     final next = _slideshowFiles[_slideshowIndex];
@@ -291,7 +340,7 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
 
     ImageProvider? newWallpaper;
 
-    if (_slideshowActive && _slideshowIndex >= 0 && _slideshowIndex < _slideshowFiles.length) {
+    if (_slideshowActive && _wallpaper != null) {
       // The slideshow owns the wallpaper while it is running; _advanceSlideshow sets it.
       return;
     }
@@ -308,6 +357,12 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
       if (await _wallpaperFile.exists()) {
         newWallpaper = _providerFor(_wallpaperFile);
       }
+    }
+
+    // Nothing of the user's and no gradient chosen: show a built-in wallpaper instead of plain black.
+    if (newWallpaper == null && await _defaultsAllowed()) {
+      if (_defaultIndex < 0) _defaultIndex = 0;
+      newWallpaper = _assetProvider(_defaultAssets[_defaultIndex]);
     }
 
     if (callId == _updateWallpaperCallCount) {

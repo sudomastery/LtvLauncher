@@ -272,6 +272,42 @@ class AppLocalizationsRu extends AppLocalizations {
   String get optimizationsFailed => 'Could not change the setting';
 
   @override
+  String get appForceClose => 'Force close';
+
+  @override
+  String get appOptimizeMode => 'Optimize mode: close all other apps and open this one';
+
+  @override
+  String get appClosed => 'Closed';
+
+  @override
+  String get appOptimizeDone => 'Other apps closed';
+
+  @override
+  String get appCloseFailed => 'Could not close (turn on Network debugging and allow it)';
+
+  @override
+  String get onboardingTitle => 'Welcome! Pick your most used apps';
+
+  @override
+  String get onboardingSubtitle => 'Choose at least 3. They go on your home screen. Everything else is one press of Down away.';
+
+  @override
+  String get onboardingSelected => 'selected';
+
+  @override
+  String get onboardingNeedMore => 'Pick at least';
+
+  @override
+  String get onboardingDone => 'Done';
+
+  @override
+  String get chooseFavoriteApps => 'Choose favorite apps';
+
+  @override
+  String get minimalistMode => 'Minimalist mode: only the wallpaper until you press an arrow key (hides again after 1 minute)';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override

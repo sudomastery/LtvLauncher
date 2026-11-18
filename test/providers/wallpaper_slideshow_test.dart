@@ -58,19 +58,32 @@ void main() {
     channel = MockFLauncherChannel();
     when(settings.timeBasedWallpaperEnabled).thenReturn(false);
     when(settings.wallpaperSlideshowMinutes).thenReturn(15);
+    when(settings.gradientUuid).thenReturn(null);
   });
 
   tearDown(() async {
     await temp.delete(recursive: true);
   });
 
-  test("creates the pictures folder and shows no wallpaper when the slideshow is off", () async {
+  test("creates the pictures folder and shows a built-in wallpaper, not black, when nothing is set up", () async {
     when(settings.wallpaperSlideshowEnabled).thenReturn(false);
 
     final service = WallpaperService(channel, settings);
-    await _waitFor(() => folder.existsSync());
+    await _waitFor(() => folder.existsSync() && service.wallpaper != null);
 
     expect(folder.existsSync(), isTrue);
+    expect(service.wallpaper, isNotNull);
+    service.dispose();
+  });
+
+  test("an explicitly chosen gradient is respected and no built-in wallpaper is drawn over it", () async {
+    when(settings.wallpaperSlideshowEnabled).thenReturn(false);
+    when(settings.gradientUuid).thenReturn("some-gradient");
+
+    final service = WallpaperService(channel, settings);
+    await _waitFor(() => folder.existsSync());
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+
     expect(service.wallpaper, isNull);
     service.dispose();
   });
@@ -96,16 +109,19 @@ void main() {
     service.dispose();
   });
 
-  test("an empty folder leaves the normal wallpaper logic in charge", () async {
+  test("an empty folder with the slideshow on rotates the built-in wallpapers", () async {
     when(settings.wallpaperSlideshowEnabled).thenReturn(true);
     await folder.create(recursive: true);
 
     final service = WallpaperService(channel, settings);
-    await _waitFor(() => service.slideshowFolderPath != null);
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+    await _waitFor(() => service.wallpaper != null);
 
     expect(service.slideshowPictureCount, 0);
-    expect(service.wallpaper, isNull);
+    expect(service.wallpaper, isNotNull);
+
+    final firstVersion = service.version;
+    await service.rescanSlideshow();
+    expect(service.version, greaterThan(firstVersion));
     service.dispose();
   });
 }

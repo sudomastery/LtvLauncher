@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flauncher/providers/apps_service.dart';
 import 'package:flauncher/widgets/add_to_category_dialog.dart';
 import 'package:flauncher/widgets/side_panel_dialog.dart';
+import 'package:flauncher/widgets/toast_pill.dart';
 import 'package:provider/provider.dart';
 import 'package:flauncher/l10n/app_localizations.dart';
 import 'package:flauncher/l10n/app_localizations_en.dart';
@@ -55,6 +56,42 @@ class _ApplicationInfoPanelState extends State<ApplicationInfoPanel>
     super.initState();
     _hasCustomBannerFuture = context.read<AppsService>()
         .hasCustomBanner(widget.application.packageName);
+  }
+
+
+  /// Force close (optimize: false) or Optimize mode (optimize: true: close every other app, then open this one).
+  Future<void> _closeApps({required bool optimize}) async {
+    final appsService = context.read<AppsService>();
+    // Captured before anything is awaited, so they stay valid after this panel closes.
+    final overlay = Overlay.maybeOf(context, rootOverlay: true);
+    final accent = Theme.of(context).colorScheme.primary;
+    final localizations = AppLocalizations.of(context) ?? AppLocalizationsEn();
+    final app = widget.application;
+    Navigator.of(context).pop(ApplicationInfoPanelResult.none);
+
+    final result = optimize
+        ? await appsService.launchOptimized(app)
+        : await appsService.forceStopApplication(app);
+
+    final ok = result['ok'] == true;
+    String text;
+    if (ok) {
+      final closed = (result['closed'] as List?)?.length;
+      text = optimize ? "${localizations.appOptimizeDone}: ${closed ?? 0}" : "${localizations.appClosed}: ${app.name}";
+    } else {
+      final reason = (result['message'] as String?)?.trim() ?? "";
+      text = "${localizations.appCloseFailed}${reason.isEmpty ? "" : ": $reason"}";
+    }
+    if (overlay == null) return;
+    showPillToast(
+      overlay,
+      text,
+      accent: accent,
+      icon: ok ? (optimize ? Icons.bolt : Icons.check_circle_outline) : Icons.error_outline,
+      iconColor: ok ? accent : Colors.redAccent,
+      // A failure message is longer, so give it a moment more to be read.
+      duration: ok ? const Duration(seconds: 2) : const Duration(milliseconds: 3500),
+    );
   }
 
   @override
@@ -141,6 +178,33 @@ class _ApplicationInfoPanelState extends State<ApplicationInfoPanel>
                        await context.read<AppsService>().launchApp(widget.application);
                        Navigator.of(context).pop(ApplicationInfoPanelResult.none);
                      },
+                   ),
+                   TextButton(
+                     child: Row(
+                       children: [
+                         const Icon(Icons.bolt),
+                         Container(width: 8),
+                         Flexible(
+                           child: Text(
+                             localizations.appOptimizeMode,
+                             style: Theme.of(context).textTheme.bodyMedium,
+                             maxLines: 2,
+                             overflow: TextOverflow.ellipsis,
+                           ),
+                         ),
+                       ],
+                     ),
+                     onPressed: () => _closeApps(optimize: true),
+                   ),
+                   TextButton(
+                     child: Row(
+                       children: [
+                         const Icon(Icons.cancel_presentation_outlined),
+                         Container(width: 8),
+                         Text(localizations.appForceClose, style: Theme.of(context).textTheme.bodyMedium),
+                       ],
+                     ),
+                     onPressed: () => _closeApps(optimize: false),
                    ),
                    // Favorites toggle button
                    Builder(
