@@ -53,20 +53,12 @@ final class SelfAdb {
             return out;
         }
         try {
-            File dir = context.getFilesDir();
-            File privateKey = new File(dir, "adbkey");
-            File publicKey = new File(dir, "adbkey.pub");
-            if (!privateKey.exists() || !publicKey.exists()) {
-                AdbKeyPair.generate(privateKey, publicKey);
-            }
-            AdbKeyPair keyPair = AdbKeyPair.read(privateKey, publicKey);
-
             // Only these two commands exist; packageName was checked against the allow list above.
             String command = enabled
                     ? "pm enable --user 0 " + packageName
                     : "pm disable-user --user 0 " + packageName;
 
-            try (Dadb dadb = Dadb.create(HOST, PORT, keyPair)) {
+            try (Dadb dadb = connect(context)) {
                 AdbShellResponse response = dadb.shell(command);
                 boolean ok = response.getExitCode() == 0;
                 out.put("ok", ok);
@@ -190,6 +182,9 @@ final class SelfAdb {
         return new File(base, "update");
     }
 
+    /** Plain file names only: the path is placed inside a shell command, so no quotes, spaces or $ are allowed. */
+    private static final Pattern UPDATE_FILE_NAME = Pattern.compile("^[A-Za-z0-9._-]+\\.apk$");
+
     static String sha256(File file) throws Exception {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         try (InputStream in = new FileInputStream(file)) {
@@ -213,7 +208,7 @@ final class SelfAdb {
             File apk = new File(path).getCanonicalFile();
             File folder = updateDirectory(context).getCanonicalFile();
             if (!apk.getPath().startsWith(folder.getPath() + File.separator)
-                    || !apk.getName().endsWith(".apk") || !apk.isFile()) {
+                    || !UPDATE_FILE_NAME.matcher(apk.getName()).matches() || !apk.isFile()) {
                 out.put("ok", false);
                 out.put("message", "The update file is not where it should be.");
                 return out;

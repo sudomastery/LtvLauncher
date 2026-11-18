@@ -87,6 +87,8 @@ void main() {
     final wallpaperService = WallpaperService(fLauncherChannel, settingsService);
 
     await untilCalled(pathProviderPlatform.getApplicationDocumentsPath());
+    // The real settings return the chosen gradient once it has been saved.
+    when(settingsService.gradientUuid).thenReturn(FLauncherGradients.greatWhale.uuid);
     await wallpaperService.setGradient(FLauncherGradients.greatWhale);
 
     verify(settingsService.setGradientUuid(FLauncherGradients.greatWhale.uuid));

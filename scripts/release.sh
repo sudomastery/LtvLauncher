@@ -24,6 +24,8 @@ set -a; . "$ENV_FILE"; set +a
 
 echo "== tests"
 flutter pub get
+flutter pub run build_runner build --delete-conflicting-outputs
+flutter pub run drift_dev schema generate drift_schemas/ test/generated_migrations/
 flutter test --reporter compact || { echo "Tests failed; nothing was published." >&2; exit 1; }
 
 BUILD=$((10000 + $(git rev-list --count HEAD)))

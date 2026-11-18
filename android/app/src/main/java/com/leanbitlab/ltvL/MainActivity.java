@@ -1243,19 +1243,14 @@ public class MainActivity extends FlutterActivity {
             }
         }
 
+        // Only an entry for THIS app counts. The original LTvLauncher can be installed next to this one,
+        // and its listener must not make this app think it has access.
         String packageName = getPackageName();
         String flat = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
         if (flat != null && !flat.isEmpty()) {
-            if (flat.contains(packageName) || flat.contains("com.leanbitlab.ltvL")) {
-                return true;
-            }
-            String[] names = flat.split(":");
-            for (String name : names) {
-                if (name.contains(packageName) || name.contains("com.leanbitlab.ltvL")) {
-                    return true;
-                }
+            for (String name : flat.split(":")) {
                 ComponentName cn = ComponentName.unflattenFromString(name);
-                if (cn != null && (cn.getPackageName().equals(packageName) || cn.getPackageName().contains("leanbitlab"))) {
+                if (cn != null && cn.getPackageName().equals(packageName)) {
                     return true;
                 }
             }

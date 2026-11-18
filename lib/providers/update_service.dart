@@ -100,6 +100,8 @@ class UpdateService extends ChangeNotifier {
   Future<void> autoCheck() async {
     final settings = _settings;
     if (settings == null || !settings.updateChecksEnabled) return;
+    // Launch and resume both call this; never start a second check over a running check, download or install.
+    if (_status == UpdateStatus.checking || _status == UpdateStatus.downloading || _status == UpdateStatus.installing) return;
     final last = DateTime.fromMillisecondsSinceEpoch(settings.lastUpdateCheckMillis);
     if (settings.lastUpdateCheckMillis != 0 && _now().difference(last) < autoCheckEvery) return;
     final reachedGitHub = await check(quiet: true);

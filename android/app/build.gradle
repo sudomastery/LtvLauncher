@@ -71,7 +71,10 @@ android {
         applicationId "com.leanbitlab.ltvL"
         // Enhanced installs as com.leanbitlab.ltvL.fork so it can sit next to the original LTvLauncher.
         // Override with -PappIdSuffix=<suffix> (an empty value gives the original application id).
-        applicationIdSuffix project.hasProperty("appIdSuffix") ? project.property("appIdSuffix") : ".fork"
+        def idSuffix = project.hasProperty("appIdSuffix") ? project.property("appIdSuffix") : ".fork"
+        applicationIdSuffix idSuffix
+        // The screensaver's settings link must point at the installed package, whatever the suffix is.
+        resValue "string", "dream_settings_activity", "com.leanbitlab.ltvL${idSuffix}/com.leanbitlab.ltvL.MainActivity"
         compileSdk 35
         minSdk 21
         targetSdk 35
@@ -131,6 +134,9 @@ android {
     }
 
     namespace 'com.leanbitlab.ltvL'
+    buildFeatures {
+        resValues true
+    }
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->

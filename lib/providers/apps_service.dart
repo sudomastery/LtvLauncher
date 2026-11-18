@@ -760,12 +760,17 @@ class AppsService extends ChangeNotifier {
   Future<Map<String, dynamic>> forceStopApplication(App app) =>
       _fLauncherChannel.forceStopApp(app.packageName);
 
-  /// Optimize mode: closes every other running app, then opens [app]. Returns {ok, message, closed}.
+  /// Optimize mode: closes every other running app, then opens [app]. The app is opened even when closing the
+  /// others failed (for example Network debugging is off), so the cleanup never blocks the main action; the
+  /// result says what happened. Returns {ok, message, closed}.
   Future<Map<String, dynamic>> launchOptimized(App app) async {
-    final result = await _fLauncherChannel.closeAllAppsExcept(app.packageName);
-    if (result['ok'] == true) {
-      await launchApp(app);
+    Map<String, dynamic> result;
+    try {
+      result = await _fLauncherChannel.closeAllAppsExcept(app.packageName);
+    } catch (e) {
+      result = {'ok': false, 'message': e.toString(), 'closed': <String>[]};
     }
+    await launchApp(app);
     return result;
   }
 

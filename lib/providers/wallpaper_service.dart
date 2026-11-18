@@ -54,6 +54,7 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
   Timer? _slideshowTimer;
   DateTime _lastSlideshowChange = DateTime.fromMillisecondsSinceEpoch(0);
   bool _slideshowActive = false;
+  int _restartGeneration = 0; // a restart that is no longer the latest stops instead of making a second timer
   int _lastSlideshowMinutes = 0;
   bool _lastSlideshowEnabled = false;
   bool _initialized = false;
@@ -232,6 +233,7 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
 
   /// (Re)starts the slideshow timer and optionally shows the next picture immediately.
   Future<void> _restartSlideshow({required bool advanceNow}) async {
+    final generation = ++_restartGeneration;
     _slideshowTimer?.cancel();
     _slideshowTimer = null;
     final enabled = _settingsService.wallpaperSlideshowEnabled;
@@ -248,8 +250,11 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     await _refreshSlideshowFiles();
+    if (generation != _restartGeneration) return; // a newer restart took over while the folder was read
     if (_slideshowFiles.isEmpty) {
-      if (!await _defaultsAllowed()) {
+      final defaultsAllowed = await _defaultsAllowed();
+      if (generation != _restartGeneration) return;
+      if (!defaultsAllowed) {
         await _updateWallpaper(force: true);
         return;
       }
@@ -402,7 +407,9 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
       await _forget(targetFile);
 
       _version++;
-      await _updateWallpaper(force: true);
+      // Not _updateWallpaper: while the built-in wallpapers rotate the slideshow owns the wallpaper and would
+      // ignore the new picture. Restarting hands control back when the user now has something of their own.
+      await _restartSlideshow(advanceNow: false);
     }
   }
 
@@ -412,6 +419,8 @@ class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
     }
 
     _settingsService.setGradientUuid(fLauncherGradient.uuid);
+    // An explicit gradient ends the built-in wallpaper rotation; without this the old picture stays on screen.
+    await _restartSlideshow(advanceNow: false);
     notifyListeners();
   }
 }
