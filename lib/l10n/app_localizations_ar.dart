@@ -7,7 +7,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'حول LTvLauncher';
+  String get aboutFlauncher => 'حول LTvLauncher Enhanced';
 
   @override
   String get addCategory => 'إضافة فئة';
@@ -251,6 +251,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get accessibility => 'إمكانية الوصول';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher هو المشغل الافتراضي';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced هو المشغل الافتراضي';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher ليس المشغل الافتراضي';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced ليس المشغل الافتراضي';
 
   @override
   String get setAsDefaultLauncher => 'تعيين كمشغل افتراضي';
 
   @override
-  String get defaultLauncherDescription => 'عند تعيينه كمشغل افتراضي، سيعود زر الصفحة الرئيسية دائماً إلى LTvLauncher. سيتم أيضاً تشغيل التلفزيون مباشرة في LTvLauncher.';
+  String get defaultLauncherDescription => 'عند تعيينه كمشغل افتراضي، سيعود زر الصفحة الرئيسية دائماً إلى LTvLauncher Enhanced. سيتم أيضاً تشغيل التلفزيون مباشرة في LTvLauncher Enhanced.';
 
   @override
   String get inputs => 'المدخلات';

@@ -154,7 +154,7 @@ class LTvLauncherAboutDialog extends StatelessWidget {
                 label: "GitHub Repository",
                 accentColor: accentColor,
                 onPressed: () {
-                  FLauncherChannel().openUrl("https://github.com/leanbitlab-org/LtvLauncher");
+                  FLauncherChannel().openUrl("https://github.com/sudomastery/LtvLauncher");
                 },
               ),
               const SizedBox(height: 6),

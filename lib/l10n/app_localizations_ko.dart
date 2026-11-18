@@ -7,7 +7,7 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'LTvLauncher 정보';
+  String get aboutFlauncher => 'LTvLauncher Enhanced 정보';
 
   @override
   String get addCategory => '카테고리 추가';
@@ -251,6 +251,27 @@ class AppLocalizationsKo extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get accessibility => '접근성';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher가 기본 런처입니다';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced가 기본 런처입니다';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher가 기본 런처가 아닙니다';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced가 기본 런처가 아닙니다';
 
   @override
   String get setAsDefaultLauncher => '기본 런처로 설정';
 
   @override
-  String get defaultLauncherDescription => '기본 런처로 설정하면 홈 버튼은 항상 LTvLauncher로 돌아갑니다. TV도 직접 LTvLauncher로 부팅됩니다.';
+  String get defaultLauncherDescription => '기본 런처로 설정하면 홈 버튼은 항상 LTvLauncher Enhanced로 돌아갑니다. TV도 직접 LTvLauncher Enhanced로 부팅됩니다.';
 
   @override
   String get inputs => '입력';

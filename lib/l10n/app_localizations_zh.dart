@@ -7,7 +7,7 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
-  String get aboutFlauncher => '关于 LTvLauncher';
+  String get aboutFlauncher => '关于 LTvLauncher Enhanced';
 
   @override
   String get addCategory => '添加类别';
@@ -251,6 +251,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accessibility => '无障碍';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher 是默认桌面';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced 是默认桌面';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher 不是默认桌面';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced 不是默认桌面';
 
   @override
   String get setAsDefaultLauncher => '设为默认桌面';
 
   @override
-  String get defaultLauncherDescription => '设为默认桌面后，按 Home 键将始终返回 LTvLauncher。电视开机也会直接进入 LTvLauncher。';
+  String get defaultLauncherDescription => '设为默认桌面后，按 Home 键将始终返回 LTvLauncher Enhanced。电视开机也会直接进入 LTvLauncher Enhanced。';
 
   @override
   String get inputs => '输入源';

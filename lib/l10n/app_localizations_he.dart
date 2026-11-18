@@ -7,7 +7,7 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'אודות LTvLauncher';
+  String get aboutFlauncher => 'אודות LTvLauncher Enhanced';
 
   @override
   String get addCategory => 'הוספת קטגוריה';
@@ -251,6 +251,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get accessibility => 'נגישות';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher הוא מסך הבית המוגדר כברירת מחדל';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced הוא מסך הבית המוגדר כברירת מחדל';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher אינו מוגדר כמסך הבית כברירת מחדל';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced אינו מוגדר כמסך הבית כברירת מחדל';
 
   @override
   String get setAsDefaultLauncher => 'הגדרה כמסך הבית כברירת מחדל';
 
   @override
-  String get defaultLauncherDescription => 'כאשר מוגדר כמסך הבית כברירת מחדל, כפתור הבית תמיד יחזיר אל LTvLauncher. הטלוויזיה גם תופעל ישירות לתוך LTvLauncher.';
+  String get defaultLauncherDescription => 'כאשר מוגדר כמסך הבית כברירת מחדל, כפתור הבית תמיד יחזיר אל LTvLauncher Enhanced. הטלוויזיה גם תופעל ישירות לתוך LTvLauncher Enhanced.';
 
   @override
   String get inputs => 'כניסות';

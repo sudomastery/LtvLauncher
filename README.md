@@ -1,230 +1,162 @@
-# LTvLauncher
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/banner_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset=".github/assets/banner_light.svg">
-  <img alt="LTvLauncher Banner" src=".github/assets/banner_light.svg">
-</picture>
-
 <div align="center">
 
-[![Latest Release](https://img.shields.io/github/v/release/leanbitlab-org/LtvLauncher?style=flat-square&color=4f46e5&label=Release)](https://github.com/leanbitlab-org/LtvLauncher/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/leanbitlab-org/LtvLauncher/total?style=flat-square&color=059669&label=Downloads)](https://github.com/leanbitlab-org/LtvLauncher/releases)
-[![Stars](https://img.shields.io/github/stars/leanbitlab-org/LtvLauncher?style=flat-square&color=dc2626&label=Stars)](https://github.com/leanbitlab-org/LtvLauncher/stargazers)
-[![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
-[![Sponsor](https://img.shields.io/badge/Sponsor-LeanBitLab-db2777?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/LeanBitLab)
-[![Donate on Open Collective](https://img.shields.io/badge/Donate-Open_Collective-1f6feb?style=flat-square&logo=opencollective&logoColor=white)](https://opencollective.com/leanbitlab-org)
+<img src="docs/enhanced/banner.png" alt="LTvLauncher Enhanced" width="420">
 
-**A fast, private, and customizable open-source launcher for Android TV.**  
-*Forked from [FLauncher](https://github.com/osrosal/flauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)).*
+# LTvLauncher Enhanced
 
-[Screenshots](#-screenshots) • [Download APKs](#-download) • [Features](#-features) • [Setup Guide](#-setup-guide) • [Community](#-community--contributing) • [Other Projects](https://github.com/LeanBitLab#-android-projects)
+**A wallpaper-first home screen for Android TV: your pictures on show, your favorite apps in one row, nothing else in the way.**
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg?style=flat-square)](LICENSE)
+![Android TV](https://img.shields.io/badge/Android%20TV-11%2B-3ddc84?style=flat-square)
+![ARM](https://img.shields.io/badge/32--bit%20and%2064--bit%20ARM-supported-orange?style=flat-square)
 
 </div>
 
----
+<p align="center">
+  <img src="docs/enhanced/home.jpg" alt="Showcase home screen with a wallpaper, HDMI shortcuts and a row of favorite apps" width="860">
+</p>
 
-## 🚀 Overview
+LTvLauncher Enhanced is a personal fork of [LTvLauncher](https://github.com/leanbitlab-org/LtvLauncher), which is itself a fork of [FLauncher](https://gitlab.com/flauncher/flauncher). It was built and tuned on a low-end 1 GB TCL Google TV, where every megabyte and every frame matters.
 
-**LTvLauncher** is an open-source, private, and ad-free launcher designed specifically for Android TV, Google TV, and Fire TV devices. Built with Flutter, it delivers a responsive, remote-friendly interface focused on simplicity, speed, and deep customization.
+Everything the original does still works: categories, Continue Watching, weather, notifications, themes, backups. This fork **revamps the home screen**, adds a set of **optimizations** for low-RAM TVs, and adds several features the original does not have.
 
-With native D-pad navigation, recency-sorted Continue Watching rows, customizable categories, dynamic weather & status bar widgets, TV input source switching, system-wide notification overlays, and OLED screensavers, LTvLauncher gives you total control over your TV home screen without intrusive ads or algorithmic noise.
+Screenshots use wallpapers generated for this README.
 
----
+## At a glance: original vs Enhanced
 
-## 📸 Screenshots
+| | LTvLauncher (original) | LTvLauncher Enhanced |
+|---|---|---|
+| **Home screen** | Rows and grids of apps fill the screen; the wallpaper is mostly hidden | **Showcase layout**: the wallpaper fills the screen with one row of favorites along the bottom. Down opens all apps, Back returns |
+| **Wallpaper** | One picture, or one day and one night picture | **Slideshow** from a folder of your pictures, with a crossfade and a choice of interval (1 minute to 24 hours) |
+| **Wallpaper memory** | Picture decoded at its full size | Decoded at the **screen width**, so a 4K picture costs no more than a 720p one |
+| **Wallpaper timers** | n/a | Slideshow **pauses while another app is in front** (no timer, no decoding) |
+| **Favorites** | Empty until you add apps | **Prefilled** with TizenTube, Plex, Prime Video, Netflix, Spotify and Twitch, only those you have installed |
+| **HDMI inputs** | A TV icon that opens a list | Small **rounded HDMI chips** under the settings icons, one press to switch, using your TV's own input names |
+| **Card style** | Default theme with small corner radius; the highlight only appears after the first key press | **Rounded Glow cards** by default, highlight visible from the first moment |
+| **Play Store** | Always running in the background | **Optimizations menu** with a switch to keep it off and back on in about three seconds |
+| **Branding** | Purple logo | **Orange logo and banner**, installs as a separate app next to the original |
+| **Donate menu** | Support and Donate entry with QR codes | Removed (and the QR code library with it) |
+| **Tests** | Existing suite | Existing suite plus new tests for the slideshow, showcase layout, favorites, HDMI chips and Optimizations |
 
-<table>
-  <tr>
-    <td align="center"><b>Home Screen</b></td>
-    <td align="center"><b>Settings Overview</b></td>
-    <td align="center"><b>Category & Layout</b></td>
-    <td align="center"><b>Accessibility & Remap</b></td>
-    <td align="center"><b>OLED Screensaver</b></td>
-  </tr>
-  <tr>
-    <td><img src="docs/images/screenshot_1.png" width="180" alt="Home Screen"/></td>
-    <td><img src="docs/images/screenshot_2.png" width="180" alt="Settings Overview"/></td>
-    <td><img src="docs/images/screenshot_3.png" width="180" alt="Category & Layout"/></td>
-    <td><img src="docs/images/screenshot_4.png" width="180" alt="Accessibility & Remap"/></td>
-    <td><img src="docs/images/screensaver.gif" width="180" alt="OLED Screensaver"/></td>
-  </tr>
-</table>
+## Revamped UI
 
----
+### Showcase home screen
+The wallpaper fills the screen and your favorite apps sit in a single row along the bottom. The only other things on screen are the settings icons, the HDMI shortcuts and the clock. Press **Down** to open the full apps view (all categories) and **Back** to return. The wallpaper overlay is lighter in showcase mode, so the picture stays bright and only the bottom edge is darkened behind the apps. Prefer the classic layout? It is one switch away in Settings, Interface, Miscellaneous.
 
-## ✨ Features
+<p align="center">
+  <img src="docs/enhanced/focus.jpg" alt="A focused app card with a soft glow" width="420">
+  <img src="docs/enhanced/all-apps.jpg" alt="The full apps view opened with Down" width="420">
+</p>
 
-### 🎬 Continue Watching & Channels
-- **Smart Recency Sorting**: Automatically aggregates and sorts Watch Next program cards by their latest playback timestamp, ensuring your most recently watched shows and movies always appear first.
-- **Theme-Adaptive Cards**: Media cards automatically adapt to the active visual style, including glowing focus indicators, border outlines, and corner radiuses.
-- **Clean Settings Configuration**: Toggle the Continue Watching channel directly from Settings without cluttering the home screen with persistent permission warnings.
+### Rounded Glow cards
+App cards are rounded and glow in the accent color when focused. The focus highlight is visible from the first moment, so you always know where you are before touching the remote. Six cards fit in the row on a 1280x720 interface.
 
-### 🌤️ Status Bar & Weather Integration
-- **Breezy Weather Integration**: Seamless support for local weather forecasts via Breezy Weather and Open-Meteo.
-- **Smart Unit Conversion**: Automatic Kelvin-to-Celsius/Fahrenheit auto-detection and conversion to prevent temperature anomalies.
-- **Weather Indicators**: Configurable precipitation/rain warning icons and customizable refresh intervals.
-- **Live Data Consumption Tracker**: Monitor daily network bandwidth (WiFi, Ethernet, or Mobile) directly from the status bar.
-- **Quick WiFi Shortcut**: Network status icon doubles as a 1-click shortcut to system WiFi settings.
-- **Stable Focus Traversal**: Precise remote focus alignment preventing focus jumps when navigating the status bar.
+### HDMI input shortcuts
+Small rounded chips under the settings icons switch the TV straight to HDMI 1, HDMI 2 and the rest, using the names your TV gives them (for example "XBOX"). They share the glow and rounded corners of the app cards, and you can reach them with Down from the settings icons. They can be switched off in Miscellaneous.
 
-### 🔔 System Notifications & TV Keypad Control
-- **Global Floating Overlays**: Receive real-time notification alerts overlaid across any running TV app.
-- **Notification Drawer**: Dedicated remote-friendly panel to view, inspect, and manage system notifications.
-- **Intuitive Blocked Apps Manager**: Clean TV remote D-pad controls (Up/Down navigation, Left/Right quick removal, and Clear All) to block unwanted notifications.
+<p align="center">
+  <img src="docs/enhanced/hdmi-chips.jpg" alt="HDMI input chips with the Xbox input focused" width="420">
+</p>
 
-### 🎨 Themes, Customization & Banners
-- **4 Distinct Visual Themes**: Choose between **Modern / Default**, **Premium**, **Classic**, and **Capsule** card styles.
-- **Accent Color Engine**: Personalize the launcher with multiple vibrant color swatches and presets.
-- **Dynamic Wallpapers**: Time-based automatic switching between day and night backgrounds, or a true pitch-black background for OLED displays.
-- **Custom Banner Support**: Assign custom banner images to sideloaded and unthemed Android TV apps.
-- **High-Visibility Focus Indicators**: Double-border focus indicator ensuring sharp cursor visibility on any background, complete with edge bump resistance.
+### Wallpaper slideshow
+Copy pictures into the launcher's wallpaper folder and they rotate on the home screen with a soft crossfade. Choose how often the picture changes: every 1, 5, 15, 30 or 60 minutes, or every 3, 12 or 24 hours (15 minutes by default). Press the folder entry in the settings to rescan after adding pictures.
 
-### 📺 TV Inputs & Accessibility
-- **Hardware Input Source Selector**: Quickly switch between HDMI 1, HDMI 2, AV, and component inputs directly from the launcher.
-- **Built-in Home Button Fix**: Seamless accessibility remapper service for Google TV and Fire TV devices that override default launchers.
-- **Burn-in Protection Screensaver**: Minimal OLED screensaver with 30-second clock position shifting.
-- **Audio Feedback**: Remote key navigation sound feedback.
+<p align="center">
+  <img src="docs/enhanced/wallpaper-slideshow.jpg" alt="Wallpaper slideshow settings" width="420">
+</p>
 
-### 💾 Privacy & Data Management
-- **100% Ad-Free & Private**: No analytics, no ads, no trackers, zero network telemetry.
-- **Multiple Backups & Restore Dialog**: Export configuration backups with timestamps and restore them via a D-pad friendly picker.
-- **Category Customization**: Reorder, rename, hide, and organize apps in grid or row layouts with remote arrow keys.
+### Favorites that adapt to what you have installed
+TizenTube, Plex, Prime Video, Netflix, Spotify and Twitch are placed in Favorites automatically, in that order, **only if they are installed**. Anything missing is simply not shown, and it appears the moment you install it. If you remove one from Favorites it stays removed. On a fresh install the Favorites row is the first section.
 
----
+### Identity
+An orange logo and banner make it easy to tell apart from the original on the home screen, and it installs as its own app (`com.leanbitlab.ltvL.fork`) next to the original. The Support and Donate menu entry is gone.
 
-## 📥 Download
+<p align="center">
+  <img src="docs/enhanced/settings.jpg" alt="Settings menu" width="420">
+</p>
 
-<table border="0">
-  <tr>
-    <td align="center" valign="middle">
-      <a href="https://github.com/leanbitlab-org/LtvLauncher/releases/latest">
-        <img alt="Get it on GitHub" src=".github/assets/get_it_on_github.png" height="75">
-      </a>
-    </td>
-    <td align="center" valign="middle">
-      <a href="https://apt.izzysoft.de/fdroid/index/apk/com.leanbitlab.ltvL">
-        <img alt="Get it on IzzyOnDroid" src=".github/assets/IzzyOnDroid.png" height="75">
-      </a>
-    </td>
-    <td align="center" valign="middle">
-      <a href="https://go.aftvnews.com">
-        <img alt="Downloader Code: 7259827" src=".github/assets/get_it_on_downloader.png" height="75">
-      </a>
-    </td>
-    <td align="center" valign="middle">
-      <a href="https://github.com/leanbitlab-org/LtvLauncher/releases">
-        <img alt="Pre-release" src=".github/badges/prerelease.png" height="75">
-      </a>
-    </td>
-  </tr>
-</table>
+## Optimizations
 
-### Architecture Matrix
+### Built into the launcher
+- **Screen-width decoding**: wallpapers are decoded no wider than the screen, so a 4K picture does not cost 4K worth of RAM on a 720p TV.
+- **Nothing runs in the background for the slideshow**: the timer and the decoding stop while another app is in front, and resume when you come back (switching the picture straight away if it is due).
+- **One picture in memory**: the previous wallpaper is evicted from the image cache as soon as the next one is shown.
+- **Idle at 0% CPU**: the launcher does no work while you are not touching it (measured below).
 
-| File | Target Devices | Architecture |
-|:---|:---|:---|
-| **`LTvLauncher-universal-release.apk`** | **Recommended** for any Android TV or Fire TV device | Universal |
-| **`LTvLauncher-arm64-v8a-release.apk`** | Chromecast with Google TV (4K/HD), Nvidia Shield TV, newer smart TVs | 64-bit ARM (`arm64-v8a`) |
-| **`LTvLauncher-armeabi-v7a-release.apk`** | Fire TV Stick (Lite, 4K, 4K Max), older smart TVs, budget boxes | 32-bit ARM (`armeabi-v7a`) |
+### The Optimizations menu
+For low-RAM TVs. Right now it has one switch: **keep the Play Store switched off**. The Play Store runs two background processes that use tens of megabytes on a 1 GB TV. Switch it off here, and back on whenever you want to install or update apps. Each change takes about three seconds, and available RAM rose by roughly 20 to 40 MB straight away in testing.
 
-> [!TIP]
-> **Fast Installation via the Downloader App (Fire TV & Android TV)**:
-> 1. Open the **Downloader** app by AFTVnews on your TV (available on Amazon Appstore & Google Play Store).
-> 2. Enter quick code **`7259827`** in the URL / search box.
-> 3. Downloader will automatically download and prompt you to install the latest LTvLauncher release.
+<p align="center">
+  <img src="docs/enhanced/optimizations.jpg" alt="Optimizations menu with the Play Store switch" width="420">
+</p>
 
----
+How it works, honestly: Android does not let a normal app disable another app. This launcher talks to the TV's own **Network debugging** service on `127.0.0.1:5555`, the same way a computer running `adb shell pm disable-user` would. That means:
 
-## 🛠️ Setup Guide
+- Network debugging must be turned on in Developer options.
+- The first time, the TV asks "Allow USB debugging?" for the launcher's key. Choose **Always allow**.
+- The app now declares the `INTERNET` permission (the original has none). It is needed because Android treats even connections to the device itself as network access. The code only ever connects to `127.0.0.1`.
+- Only an allow list of apps can be switched (currently only `com.android.vending`), and only two fixed commands are ever sent: `pm disable-user --user 0 <package>` and `pm enable --user 0 <package>`. See [`SelfAdb.java`](android/app/src/main/java/com/leanbitlab/ltvL/SelfAdb.java).
+- To undo it from a computer: `adb shell pm enable com.android.vending`.
 
-### Method 1: Via Built-in Settings (Recommended for Android TV)
-This is the easiest and native way:
-1. Open **Settings -> Accessibility -> Set as default launcher**.
-2. Select **LTvLauncher** from the system home app picker or default apps list.
+### Measured performance
+Measured on a TCL Google TV (MediaTek MT5867, four Cortex-A55 cores at 1.5 GHz, 32-bit, 1 GB RAM, Android 11, 1280x720 interface):
 
-> [!NOTE]
-> On **Google TV**, the stock launcher (`com.google.android.apps.tv.launcherx`) registers its HOME intent with priority 2, which overrides third-party launcher selections. If your device returns to Google TV when pressing Home, use **Method 2**.
+| | LTvLauncher Enhanced |
+|---|---|
+| Moving across the favorites row | 117 of 117 animation frames within 20 ms (steady 60 fps) |
+| Opening and scrolling the full apps view | 90 of 92 frames within 20 ms, none slower than 66 ms |
+| CPU while idle | 0% |
+| Warm start | about 0.6 to 0.8 s (the original LTvLauncher: 0.75 to 0.84 s) |
+| Memory in use | about 80 to 100 MB (84 MB at start, about 94 MB after opening and scrolling all apps) |
 
-### Method 2: Home Button Fix (Google TV & Fire TV)
-If your device blocks changing the default launcher, use LTvLauncher's built-in Home Button Fix:
-1. Open **Settings -> Accessibility**.
-2. Select **Home Button Fix (Google TV)**.
-3. Turn on the accessibility service for **LTvLauncher** in your system settings.
+For comparison, on the same TV Projectivy Launcher used roughly 39% of one core while idle in the foreground. Apart from start time these numbers were not measured against the original launcher, and they come from a single device using `dumpsys`, so treat them as a guide, not a benchmark.
 
-Once enabled, LTvLauncher automatically intercepts Home button presses and brings you straight to your custom home screen.
+## Every other change
 
-### Method 3: Remap the Home button via Key Mapper
-If you prefer key remapping:
-1. Install [Key Mapper](https://github.com/keymapperorg/KeyMapper).
-2. Create a trigger for your remote's **Home** button.
-3. Bind the action to launch **LTvLauncher**.
+- **Bug fix**: creating a category through `addCategory` saved only its name and position, so its row height, layout type, sort order and column count were lost on restart. They are now stored.
+- **Tests**: new tests for the wallpaper slideshow, showcase layout, default favorites, HDMI chips and the Optimizations page. Existing tests were updated for the new settings and names.
+- **Dependencies**: `dadb` added (ADB client for the Optimizations menu); `qr_flutter` removed along with the Donate dialog.
+- **Settings**: new switches for the showcase layout and the HDMI shortcuts, a slideshow switch and interval, and the Optimizations page. All new text is in the English strings and falls back to English in the other languages until translated.
+- **Build**: the `.fork` application id suffix is the default, with an override. APKs are named `LTvLauncher-Enhanced-<abi>`.
 
-### Method 4: Disable the default launcher via ADB
+## Install
 
-> [!WARNING]
-> Disabling system packages carries risks. Proceed with caution and ensure you have ADB debugging enabled on your TV.
+[Build the APK](#build-from-source) (or download it from the [releases page](https://github.com/sudomastery/LtvLauncher/releases) if one has been published). Then, with Network debugging turned on:
 
-Connect your computer to your TV via ADB (`adb connect <tv-ip-address>`) and run:
-
-```shell
-# Disable the default Google TV launcher
-$ adb shell pm disable-user --user 0 com.google.android.apps.tv.launcherx
-
-# Disable setup fallback to prevent auto-reenabling
-$ adb shell pm disable-user --user 0 com.google.android.tungsten.setupwraith
+```sh
+adb connect <tv-ip>:5555
+adb install -r LTvLauncher-Enhanced-armeabi-v7a.apk      # 32-bit TVs; use arm64-v8a for 64-bit
+adb shell cmd package set-home-activity com.leanbitlab.ltvL.fork/com.leanbitlab.ltvL.MainActivity
 ```
 
-To re-enable the default launcher at any time:
-```shell
-$ adb shell pm enable com.google.android.apps.tv.launcherx
-$ adb shell pm enable com.google.android.tungsten.setupwraith
+Add wallpapers:
+
+```sh
+adb shell mkdir -p /sdcard/Android/data/com.leanbitlab.ltvL.fork/files/wallpapers
+adb push my-wallpapers/. /sdcard/Android/data/com.leanbitlab.ltvL.fork/files/wallpapers/
 ```
 
----
+JPG, PNG and WebP files work. 1920x1080 is plenty for a TV.
 
-## 📱 More Android Projects by LeanBitLab
+## Build from source
 
-Discover our complete suite of privacy-first, open-source Android applications and utilities:  
-👉 **[Explore All LeanBitLab Android Projects](https://github.com/LeanBitLab#-android-projects)**
+You need Flutter **3.24.5**, Java 21 and the Android SDK.
 
----
+```sh
+flutter pub get
+flutter build apk --release --target-platform android-arm --split-per-abi   # 32-bit; use android-arm64 for 64-bit
+```
 
-## 🤝 Community & Contributing
+To sign a release build, set `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD` in the environment first. The app id suffix `.fork` is the default; pass `--android-project-arg=appIdSuffix=` (empty) to build with the original application id.
 
-- **Bug Reports & Feature Requests**: [Open a GitHub Issue](https://github.com/leanbitlab-org/LtvLauncher/issues)
-- **Discussions & Feedback**: [GitHub Discussions](https://github.com/leanbitlab-org/LtvLauncher/discussions)
-- **Official Telegram Channel**: [@LeanBitLab](https://t.me/leanbitlab)
+Run the tests with `flutter test`. Mocks are generated, so run `dart run build_runner build --delete-conflicting-outputs` first. `test/database_migration_test.dart` also needs generated migration schemas and fails without them.
 
----
+On Fedora, Dart's TLS stack can fail to fetch packages with `CERTIFICATE_VERIFY_FAILED` because the system certificate bundle lacks an old GlobalSign root that Google's chain mentions. Starting `dart` with `--root-certs-file=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem` works around it.
 
-## 💖 Support the Project
+## Credits and licence
 
-Building and maintaining a lightweight, ad-free Android TV launcher requires hardware testing across various TV chipsets, display profiles, and continuous development.
+- **LTvLauncher** by [LeanBitLab](https://github.com/leanbitlab-org/LtvLauncher): the base of this fork.
+- **FLauncher** by Etienne Fesser, and the community forks it grew from.
+- [`dadb`](https://github.com/mobile-dev-inc/dadb) (Apache-2.0) provides the ADB client used by the Optimizations menu.
 
-If LTvLauncher improves your daily TV experience, please consider supporting our work!
-
-<div align="left">
-  <a href="https://github.com/sponsors/LeanBitLab">
-    <img src="https://img.shields.io/static/v1?label=Sponsor%20on%20GitHub&message=%E2%9D%A4&logo=GitHub&color=%23db2777" height="38" alt="Sponsor LeanBitLab on GitHub"/>
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://opencollective.com/leanbitlab-org">
-    <img src="https://img.shields.io/static/v1?label=Donate%20on&message=Open%20Collective&logo=opencollective&logoColor=white&color=%231f6feb" height="38" alt="Donate to LeanBitLab on Open Collective"/>
-  </a>
-</div>
-
----
-
-## 📜 Credits & Acknowledgments
-
-- **[FLauncher](https://gitlab.com/flauncher/flauncher)** by [etienn01](https://github.com/etienn01) — The original TV launcher project.
-- **[FLauncher (Fork)](https://github.com/osrosal/flauncher)** by [osrosal](https://github.com/osrosal) — The foundation for this fork.
-- All [contributors](https://github.com/leanbitlab-org/LtvLauncher/graphs/contributors) and open-source supporters!
-
----
-
-## ⚖️ License
-
-LTvLauncher is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.  
-See the [LICENSE](LICENSE) file for details.
+LTvLauncher Enhanced is released under the **GNU General Public License v3.0**, the same licence as the projects it is built on. See [LICENSE](LICENSE) and [CHANGELOG.md](CHANGELOG.md).

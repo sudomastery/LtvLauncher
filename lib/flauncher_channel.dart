@@ -55,6 +55,20 @@ class FLauncherChannel {
     }
   }
 
+  /// True when the package is installed and enabled.
+  Future<bool> isPackageEnabled(String packageName) async =>
+      await _methodChannel.invokeMethod<bool>('isPackageEnabled', packageName) ?? false;
+
+  /// Enables or disables an app from the launcher's approved list (see SelfAdb.java).
+  /// Returns {ok: bool, message: String}.
+  Future<Map<String, dynamic>> setPackageEnabled(String packageName, bool enabled) async {
+    final result = await _methodChannel.invokeMapMethod<String, dynamic>(
+      'setPackageEnabled',
+      {'packageName': packageName, 'enabled': enabled},
+    );
+    return result ?? {'ok': false, 'message': 'No answer from the system.'};
+  }
+
   Future<void> launchActivityFromAction(String action) async => await _methodChannel.invokeMethod('launchActivityFromAction', action);
 
   Future<void> launchApp(String packageName) async => await _methodChannel.invokeMethod('launchApp', packageName);

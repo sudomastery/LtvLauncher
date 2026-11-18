@@ -69,10 +69,9 @@ android {
 
     defaultConfig {
         applicationId "com.leanbitlab.ltvL"
-        // Lets a test build install next to the original: ./gradlew ... -PappIdSuffix=.fork
-        if (project.hasProperty("appIdSuffix")) {
-            applicationIdSuffix project.property("appIdSuffix")
-        }
+        // Enhanced installs as com.leanbitlab.ltvL.fork so it can sit next to the original LTvLauncher.
+        // Override with -PappIdSuffix=<suffix> (an empty value gives the original application id).
+        applicationIdSuffix project.hasProperty("appIdSuffix") ? project.property("appIdSuffix") : ".fork"
         compileSdk 35
         minSdk 21
         targetSdk 35
@@ -138,12 +137,17 @@ android {
             output.versionCodeOverride = variant.versionCode
             def abi = output.getFilter(com.android.build.OutputFile.ABI)
             if (abi != null) {
-                outputFileName = "LTvLauncher-${abi}-${variant.buildType.name}.apk"
+                outputFileName = "LTvLauncher-Enhanced-${abi}-${variant.buildType.name}.apk"
             } else {
-                outputFileName = "LTvLauncher-universal-${variant.buildType.name}.apk"
+                outputFileName = "LTvLauncher-Enhanced-universal-${variant.buildType.name}.apk"
             }
         }
     }
+}
+
+dependencies {
+    // ADB client used by SelfAdb to enable/disable approved apps through the TV's own network debugging
+    implementation 'dev.mobile:dadb:1.2.10'
 }
 
 flutter {

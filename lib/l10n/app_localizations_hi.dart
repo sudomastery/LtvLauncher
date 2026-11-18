@@ -7,7 +7,7 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'LTvLauncher के बारे में';
+  String get aboutFlauncher => 'LTvLauncher Enhanced के बारे में';
 
   @override
   String get addCategory => 'श्रेणी जोड़ें';
@@ -251,6 +251,27 @@ class AppLocalizationsHi extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String get accessibility => 'पहुंच (एक्सेसिबिलिटी)';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher डिफ़ॉल्ट लॉन्चर है';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced डिफ़ॉल्ट लॉन्चर है';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher डिफ़ॉल्ट लॉन्चर नहीं है';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced डिफ़ॉल्ट लॉन्चर नहीं है';
 
   @override
   String get setAsDefaultLauncher => 'डिफ़ॉल्ट लॉन्चर के रूप में सेट करें';
 
   @override
-  String get defaultLauncherDescription => 'डिफ़ॉल्ट लॉन्चर के रूप में सेट होने पर, होम बटन हमेशा LTvLauncher पर वापस आएगा। टीवी भी सीधे LTvLauncher में बूट होगा।';
+  String get defaultLauncherDescription => 'डिफ़ॉल्ट लॉन्चर के रूप में सेट होने पर, होम बटन हमेशा LTvLauncher Enhanced पर वापस आएगा। टीवी भी सीधे LTvLauncher Enhanced में बूट होगा।';
 
   @override
   String get inputs => 'इनपुट';

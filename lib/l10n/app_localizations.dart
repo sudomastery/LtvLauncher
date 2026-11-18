@@ -126,7 +126,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutFlauncher.
   ///
   /// In en, this message translates to:
-  /// **'About LTvLauncher'**
+  /// **'About LTvLauncher Enhanced'**
   String get aboutFlauncher;
 
   /// No description provided for @addCategory.
@@ -498,7 +498,7 @@ abstract class AppLocalizations {
   /// No description provided for @textAboutDialog.
   ///
   /// In en, this message translates to:
-  /// **'LTvLauncher is a customized open-source launcher for Android TV, based on FLauncher.\n\nDeveloped by LeanBitLab.\nSource code available at {repoUrl}.'**
+  /// **'LTvLauncher Enhanced is a personal fork of LTvLauncher with a wallpaper showcase home screen, a wallpaper slideshow, default favorites and an optimizations menu.\n\nBased on LTvLauncher by LeanBitLab, which is based on FLauncher by Etienne Fesser. Licensed under GPL-3.0.\nSource code available at {repoUrl}.'**
   String textAboutDialog(String repoUrl);
 
   /// No description provided for @textEmptyCategory.
@@ -591,6 +591,48 @@ abstract class AppLocalizations {
   /// **'Showcase home screen (wallpaper with one row of apps)'**
   String get showcaseLayout;
 
+  /// No description provided for @showInputShortcuts.
+  ///
+  /// In en, this message translates to:
+  /// **'HDMI input shortcuts under the settings icons'**
+  String get showInputShortcuts;
+
+  /// No description provided for @optimizations.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimizations'**
+  String get optimizations;
+
+  /// No description provided for @optimizationsPlayStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Play Store switched off'**
+  String get optimizationsPlayStore;
+
+  /// No description provided for @optimizationsPlayStoreHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.'**
+  String get optimizationsPlayStoreHint;
+
+  /// No description provided for @optimizationsAdbHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.'**
+  String get optimizationsAdbHint;
+
+  /// No description provided for @optimizationsWorking.
+  ///
+  /// In en, this message translates to:
+  /// **'Working... approve the prompt on the TV if it appears.'**
+  String get optimizationsWorking;
+
+  /// No description provided for @optimizationsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not change the setting'**
+  String get optimizationsFailed;
+
   /// No description provided for @wallpaperSlideshowInterval.
   ///
   /// In en, this message translates to:
@@ -618,13 +660,13 @@ abstract class AppLocalizations {
   /// No description provided for @defaultLauncherIsDefault.
   ///
   /// In en, this message translates to:
-  /// **'LTvLauncher is the default launcher'**
+  /// **'LTvLauncher Enhanced is the default launcher'**
   String get defaultLauncherIsDefault;
 
   /// No description provided for @defaultLauncherNotDefault.
   ///
   /// In en, this message translates to:
-  /// **'LTvLauncher is not the default launcher'**
+  /// **'LTvLauncher Enhanced is not the default launcher'**
   String get defaultLauncherNotDefault;
 
   /// No description provided for @setAsDefaultLauncher.
@@ -636,7 +678,7 @@ abstract class AppLocalizations {
   /// No description provided for @defaultLauncherDescription.
   ///
   /// In en, this message translates to:
-  /// **'When set as the default launcher, the Home button will always return to LTvLauncher. The TV will also boot directly into LTvLauncher.'**
+  /// **'When set as the default launcher, the Home button will always return to LTvLauncher Enhanced. The TV will also boot directly into LTvLauncher Enhanced.'**
   String get defaultLauncherDescription;
 
   /// No description provided for @inputs.

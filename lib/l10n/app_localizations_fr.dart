@@ -7,7 +7,7 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'À propos de LTvLauncher';
+  String get aboutFlauncher => 'À propos de LTvLauncher Enhanced';
 
   @override
   String get addCategory => 'Ajouter une catégorie';
@@ -251,6 +251,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get accessibility => 'Accessibilité';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher est le lanceur par défaut';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced est le lanceur par défaut';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher n\'est pas le lanceur par défaut';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced n\'est pas le lanceur par défaut';
 
   @override
   String get setAsDefaultLauncher => 'Définir comme lanceur par défaut';
 
   @override
-  String get defaultLauncherDescription => 'Lorsqu\'il est défini comme lanceur par défaut, le bouton Accueil reviendra toujours à LTvLauncher. La TV démarrera également directement sur LTvLauncher.';
+  String get defaultLauncherDescription => 'Lorsqu\'il est défini comme lanceur par défaut, le bouton Accueil reviendra toujours à LTvLauncher Enhanced. La TV démarrera également directement sur LTvLauncher Enhanced.';
 
   @override
   String get inputs => 'Entrées';

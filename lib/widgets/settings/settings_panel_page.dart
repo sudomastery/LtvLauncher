@@ -19,11 +19,11 @@
 import 'package:flauncher/providers/apps_service.dart';
 import 'package:flauncher/widgets/settings/accessibility_page.dart';
 import 'package:flauncher/widgets/settings/applications_panel_page.dart';
-import 'package:flauncher/widgets/settings/donate_dialog.dart';
 import 'package:flauncher/widgets/settings/flauncher_about_dialog.dart';
 import 'package:flauncher/widgets/settings/interface_settings_page.dart';
 import 'package:flauncher/widgets/settings/display_settings_page.dart';
 import 'package:flauncher/widgets/settings/notifications_settings_page.dart';
+import 'package:flauncher/widgets/settings/optimizations_page.dart';
 import 'package:flauncher/widgets/settings/general_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -76,17 +76,14 @@ class SettingsPanelPage extends StatelessWidget {
                   onPressed: () => Navigator.of(context).pushNamed(GeneralSettingsPage.routeName),
                 ),
                 FocusableSettingsTile(
+                  leading: const Icon(Icons.speed),
+                  title: Text(localizations.optimizations, style: Theme.of(context).textTheme.bodyMedium),
+                  onPressed: () => Navigator.of(context).pushNamed(OptimizationsPage.routeName),
+                ),
+                FocusableSettingsTile(
                   leading: const Icon(Icons.accessibility_new),
                   title: Text(localizations.accessibility, style: Theme.of(context).textTheme.bodyMedium),
                   onPressed: () => Navigator.of(context).pushNamed(AccessibilityPage.routeName),
-                ),
-                FocusableSettingsTile(
-                  leading: const Icon(Icons.favorite_rounded),
-                  title: Text("Support & Donate", style: Theme.of(context).textTheme.bodyMedium),
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (_) => const DonateDialog(),
-                  ),
                 ),
                 const Divider(),
                 FocusableSettingsTile(

@@ -74,6 +74,14 @@ void main() {
     expect(favorites(service).applications, isEmpty);
   });
 
+  test('the Favorites row height is stored in the database, not just in memory', () async {
+    final service = await start([_app('io.gh.reisxd.tizentube.cobalt', 'TizenTube')]);
+    expect(favorites(service).rowHeight, 90);
+
+    final stored = await database.getCategories();
+    expect(stored.firstWhere((c) => c.name == 'Favorites').rowHeight, 90);
+  });
+
   test('default favorites list covers the six apps from the old home screen', () {
     expect(AppsService.defaultFavoritePackages, [
       'io.gh.reisxd.tizentube.cobalt',

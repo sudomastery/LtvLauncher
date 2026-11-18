@@ -48,6 +48,12 @@ class MiscPanelPage extends StatelessWidget {
                 secondary: const Icon(Icons.wallpaper),
               ),
               RoundedSwitchListTile(
+                value: settingsService.showInputShortcuts,
+                onChanged: (value) => settingsService.setShowInputShortcuts(value),
+                title: Text(localizations.showInputShortcuts, style: Theme.of(context).textTheme.bodyMedium),
+                secondary: const Icon(Icons.settings_input_hdmi),
+              ),
+              RoundedSwitchListTile(
                 value: settingsService.appHighlightAnimationEnabled,
                 onChanged: (value) => settingsService.setAppHighlightAnimationEnabled(value),
                 title: Text(localizations.appCardHighlightAnimation, style: Theme.of(context).textTheme.bodyMedium),

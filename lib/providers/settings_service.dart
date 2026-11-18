@@ -45,6 +45,7 @@ const String _accentColorKey = "accent_color";
 const String _screensaverClockStyleKey = "screensaver_clock_style";
 const String _screensaverAnimationStyleKey = "screensaver_animation_style";
 const String _timeBasedWallpaperEnabledKey = "time_based_wallpaper_enabled";
+const String _showInputShortcutsKey = "show_input_shortcuts";
 const String _showcaseLayoutKey = "showcase_layout";
 const String _wallpaperSlideshowEnabledKey = "wallpaper_slideshow_enabled";
 const String _wallpaperSlideshowMinutesKey = "wallpaper_slideshow_minutes";
@@ -125,6 +126,7 @@ class SettingsService extends ChangeNotifier {
   late String _screensaverClockStyle;
   late String _screensaverAnimationStyle;
   late bool _timeBasedWallpaperEnabled;
+  late bool _showInputShortcuts;
   late bool _showcaseLayout;
   late bool _wallpaperSlideshowEnabled;
   late int _wallpaperSlideshowMinutes;
@@ -252,6 +254,7 @@ class SettingsService extends ChangeNotifier {
     _screensaverClockStyle = _sharedPreferences.getString(_screensaverClockStyleKey) ?? "minimal";
     _screensaverAnimationStyle = _sharedPreferences.getString(_screensaverAnimationStyleKey) ?? SCREENSAVER_ANIMATION_BOUNCE;
     _timeBasedWallpaperEnabled = _sharedPreferences.getBool(_timeBasedWallpaperEnabledKey) ?? false;
+    _showInputShortcuts = _sharedPreferences.getBool(_showInputShortcutsKey) ?? true;
     _showcaseLayout = _sharedPreferences.getBool(_showcaseLayoutKey) ?? true;
     _wallpaperSlideshowEnabled = _sharedPreferences.getBool(_wallpaperSlideshowEnabledKey) ?? true;
     _wallpaperSlideshowMinutes = _sharedPreferences.getInt(_wallpaperSlideshowMinutesKey) ?? 15;
@@ -302,6 +305,7 @@ class SettingsService extends ChangeNotifier {
       _screensaverClockStyleKey: _screensaverClockStyle,
       _screensaverAnimationStyleKey: _screensaverAnimationStyle,
       _timeBasedWallpaperEnabledKey: _timeBasedWallpaperEnabled,
+      _showInputShortcutsKey: _showInputShortcuts,
       _showcaseLayoutKey: _showcaseLayout,
       _wallpaperSlideshowEnabledKey: _wallpaperSlideshowEnabled,
       _wallpaperSlideshowMinutesKey: _wallpaperSlideshowMinutes,
@@ -472,6 +476,15 @@ class SettingsService extends ChangeNotifier {
   Future<void> setScreensaverAnimationStyle(String style) async {
     await _sharedPreferences.setString(_screensaverAnimationStyleKey, style);
     _screensaverAnimationStyle = style;
+    notifyListeners();
+  }
+
+  /// Small HDMI input chips under the settings icons.
+  bool get showInputShortcuts => _showInputShortcuts;
+
+  Future<void> setShowInputShortcuts(bool show) async {
+    await _sharedPreferences.setBool(_showInputShortcutsKey, show);
+    _showInputShortcuts = show;
     notifyListeners();
   }
 

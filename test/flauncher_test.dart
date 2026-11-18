@@ -643,6 +643,7 @@ void main() {
 SettingsService mkSettingsService({bool showcase = false}) {
   final settingsService = MockSettingsService();
   when(settingsService.showcaseLayout).thenReturn(showcase);
+  when(settingsService.showInputShortcuts).thenReturn(true);
   when(settingsService.dateFormat).thenReturn(SettingsService.defaultDateFormat);
   when(settingsService.timeFormat).thenReturn(SettingsService.defaultTimeFormat);
   when(settingsService.appHighlightAnimationEnabled).thenReturn(true);
@@ -680,6 +681,7 @@ WallpaperService mkWallpaperService([bool wallpaper = true]) {
 TvInputsService mkTvInputsService() {
   final tvInputsService = MockTvInputsService();
   when(tvInputsService.hasInputs).thenReturn(false);
+  when(tvInputsService.inputs).thenReturn([]);
   return tvInputsService;
 }
 

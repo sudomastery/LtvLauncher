@@ -7,7 +7,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'About LTvLauncher';
+  String get aboutFlauncher => 'About LTvLauncher Enhanced';
 
   @override
   String get addCategory => 'Add category';
@@ -202,7 +202,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String textAboutDialog(String repoUrl) {
-    return 'LTvLauncher is a customized open-source launcher for Android TV, based on FLauncher.\n\nDeveloped by LeanBitLab.\nSource code available at $repoUrl.';
+    return 'LTvLauncher Enhanced is a personal fork of LTvLauncher with a wallpaper showcase home screen, a wallpaper slideshow, default favorites and an optimizations menu.\n\nBased on LTvLauncher by LeanBitLab, which is based on FLauncher by Etienne Fesser. Licensed under GPL-3.0.\nSource code available at $repoUrl.';
   }
 
   @override
@@ -251,6 +251,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accessibility => 'Accessibility';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher is the default launcher';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced is the default launcher';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher is not the default launcher';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced is not the default launcher';
 
   @override
   String get setAsDefaultLauncher => 'Set as default launcher';
 
   @override
-  String get defaultLauncherDescription => 'When set as the default launcher, the Home button will always return to LTvLauncher. The TV will also boot directly into LTvLauncher.';
+  String get defaultLauncherDescription => 'When set as the default launcher, the Home button will always return to LTvLauncher Enhanced. The TV will also boot directly into LTvLauncher Enhanced.';
 
   @override
   String get inputs => 'Inputs';

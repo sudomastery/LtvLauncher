@@ -43,6 +43,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeDateFormatting();
 
+  // A TV is driven by a remote: always show which card has focus, even before the first key press.
+  FocusManager.instance.highlightStrategy = FocusHighlightStrategy.alwaysTraditional;
+
   // Configure LRU Image Cache bounds to preserve RAM on Android TV devices
   PaintingBinding.instance.imageCache.maximumSizeBytes = 35 * 1024 * 1024; // 35MB max RAM
   PaintingBinding.instance.imageCache.maximumSize = 80; // max 80 images

@@ -7,7 +7,7 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'LTvLauncherについて';
+  String get aboutFlauncher => 'LTvLauncher Enhancedについて';
 
   @override
   String get addCategory => 'カテゴリを追加';
@@ -251,6 +251,27 @@ class AppLocalizationsJa extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accessibility => 'アクセシビリティ';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncherはデフォルトのランチャーです';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhancedはデフォルトのランチャーです';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncherはデフォルトのランチャーではありません';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhancedはデフォルトのランチャーではありません';
 
   @override
   String get setAsDefaultLauncher => 'デフォルトのランチャーに設定';
 
   @override
-  String get defaultLauncherDescription => 'デフォルトのランチャーに設定すると、ホームボタンは常にLTvLauncherに戻ります。TVの起動時も直接LTvLauncherが起動します。';
+  String get defaultLauncherDescription => 'デフォルトのランチャーに設定すると、ホームボタンは常にLTvLauncher Enhancedに戻ります。TVの起動時も直接LTvLauncher Enhancedが起動します。';
 
   @override
   String get inputs => '入力';

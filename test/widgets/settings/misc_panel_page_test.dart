@@ -40,6 +40,10 @@ void main() {
     await tester.pumpWidget(buildSubject());
     await tester.pumpAndSettle();
 
+    // The list is longer than the test screen now, so scroll the switch into view first.
+    await tester.scrollUntilVisible(find.text('Add newly installed apps to launcher'), 300);
+    await tester.pumpAndSettle();
+
     expect(find.text('Add newly installed apps to launcher'), findsOneWidget);
     expect(settingsService.autoAddNewApps, isTrue);
 

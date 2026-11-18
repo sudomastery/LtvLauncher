@@ -197,6 +197,16 @@ public class MainActivity extends FlutterActivity {
                 case "isBreezyWeatherInstalled" -> result.success(isBreezyWeatherInstalled());
                 case "openBreezyWeather" -> result.success(openBreezyWeather());
                 case "getPackageName" -> result.success(getPackageName());
+                case "isPackageEnabled" -> result.success(isPackageEnabled(call.arguments()));
+                case "setPackageEnabled" -> {
+                    final String targetPackage = call.argument("packageName");
+                    final Boolean targetEnabled = call.argument("enabled");
+                    sIoExecutor.execute(() -> {
+                        final Map<String, Object> outcome = SelfAdb.setPackageEnabled(
+                                getApplicationContext(), targetPackage, targetEnabled != null && targetEnabled);
+                        runOnUiThread(() -> result.success(outcome));
+                    });
+                }
                 case "playClickSound" -> {
                     getWindow().getDecorView().playSoundEffect(android.view.SoundEffectConstants.CLICK);
                     result.success(null);
@@ -957,6 +967,15 @@ public class MainActivity extends FlutterActivity {
         }
 
         return totalBytes;
+    }
+
+    /** True when the app is installed and enabled, false when it is disabled or not installed. */
+    private boolean isPackageEnabled(String packageName) {
+        try {
+            return getPackageManager().getApplicationInfo(packageName, 0).enabled;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean checkUsageStatsPermission() {

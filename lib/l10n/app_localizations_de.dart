@@ -7,7 +7,7 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'Über LTvLauncher';
+  String get aboutFlauncher => 'Über LTvLauncher Enhanced';
 
   @override
   String get addCategory => 'Kategorie hinzufügen';
@@ -251,6 +251,27 @@ class AppLocalizationsDe extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get accessibility => 'Barrierefreiheit';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher ist der Standard-Launcher';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced ist der Standard-Launcher';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher ist nicht der Standard-Launcher';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced ist nicht der Standard-Launcher';
 
   @override
   String get setAsDefaultLauncher => 'Als Standard-Launcher festlegen';
 
   @override
-  String get defaultLauncherDescription => 'Wenn als Standard-Launcher festgelegt, kehrt die Home-Taste immer zu LTvLauncher zurück. Der TV bootet ebenfalls direkt in LTvLauncher.';
+  String get defaultLauncherDescription => 'Wenn als Standard-Launcher festgelegt, kehrt die Home-Taste immer zu LTvLauncher Enhanced zurück. Der TV bootet ebenfalls direkt in LTvLauncher Enhanced.';
 
   @override
   String get inputs => 'Eingänge';

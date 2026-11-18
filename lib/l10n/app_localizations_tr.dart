@@ -7,7 +7,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'LTvLauncher Hakkında';
+  String get aboutFlauncher => 'LTvLauncher Enhanced Hakkında';
 
   @override
   String get addCategory => 'Kategori ekle';
@@ -251,6 +251,27 @@ class AppLocalizationsTr extends AppLocalizations {
   String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
 
   @override
+  String get showInputShortcuts => 'HDMI input shortcuts under the settings icons';
+
+  @override
+  String get optimizations => 'Optimizations';
+
+  @override
+  String get optimizationsPlayStore => 'Keep Play Store switched off';
+
+  @override
+  String get optimizationsPlayStoreHint => 'Frees up to about 70 MB of RAM. Switch it back on here whenever you want to install or update apps.';
+
+  @override
+  String get optimizationsAdbHint => 'Needs Network debugging turned on in Developer options. The first time, the TV asks to allow debugging for this launcher: choose Always allow.';
+
+  @override
+  String get optimizationsWorking => 'Working... approve the prompt on the TV if it appears.';
+
+  @override
+  String get optimizationsFailed => 'Could not change the setting';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
@@ -263,16 +284,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get accessibility => 'Erişilebilirlik';
 
   @override
-  String get defaultLauncherIsDefault => 'LTvLauncher varsayılan başlatıcıdır';
+  String get defaultLauncherIsDefault => 'LTvLauncher Enhanced varsayılan başlatıcıdır';
 
   @override
-  String get defaultLauncherNotDefault => 'LTvLauncher varsayılan başlatıcı değildir';
+  String get defaultLauncherNotDefault => 'LTvLauncher Enhanced varsayılan başlatıcı değildir';
 
   @override
   String get setAsDefaultLauncher => 'Varsayılan başlatıcı olarak ayarla';
 
   @override
-  String get defaultLauncherDescription => 'Varsayılan başlatıcı olarak ayarlandığında, Ana Sayfa düğmesi her zaman LTvLauncher\'a döner. TV de doğrudan LTvLauncher\'da başlar.';
+  String get defaultLauncherDescription => 'Varsayılan başlatıcı olarak ayarlandığında, Ana Sayfa düğmesi her zaman LTvLauncher Enhanced\'a döner. TV de doğrudan LTvLauncher Enhanced\'da başlar.';
 
   @override
   String get inputs => 'Girişler';
