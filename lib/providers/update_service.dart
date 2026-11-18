@@ -267,6 +267,7 @@ class UpdateService extends ChangeNotifier {
 
   static String _readable(Object e) {
     if (e is SocketException) return 'No connection to GitHub (${e.message}).';
+    if (e is HttpException) return e.message;
     return e.toString();
   }
 
@@ -281,6 +282,9 @@ class UpdateService extends ChangeNotifier {
       request.headers.set(HttpHeaders.acceptHeader, 'application/vnd.github+json');
       request.headers.set(HttpHeaders.userAgentHeader, 'LTvLauncher-Enhanced');
       final response = await request.close().timeout(const Duration(seconds: 30));
+      if (response.statusCode == 404) {
+        throw const HttpException('No release has been published yet.');
+      }
       if (response.statusCode != 200) {
         throw HttpException('GitHub answered ${response.statusCode}');
       }
