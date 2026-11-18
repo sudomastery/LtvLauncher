@@ -28,6 +28,8 @@ import 'package:flauncher/widgets/launcher_alternative_view.dart';
 import 'package:flauncher/widgets/focus_aware_app_bar.dart';
 import 'package:flauncher/widgets/input_shortcuts.dart';
 import 'package:flauncher/widgets/onboarding_page.dart';
+import 'package:flauncher/widgets/update_banner.dart';
+import 'package:flauncher/providers/update_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -63,7 +65,10 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     // The controls only hide while nothing (a panel, a dialog) is open on top of the home screen.
     _launcherState.minimalistCanHide = () => mounted && (ModalRoute.of(context)?.isCurrent ?? true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _syncMinimalist(force: true);
+      if (!mounted) return;
+      _syncMinimalist(force: true);
+      // Look for a newer version (at most once a day, silently).
+      context.read<UpdateService>().autoCheck();
     });
   }
 
@@ -88,8 +93,11 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Back from another app: start again from the bare wallpaper.
-    if (state == AppLifecycleState.resumed && mounted && context.read<SettingsService>().minimalistMode) {
-      context.read<LauncherState>().setMinimalistActive(true);
+    if (state == AppLifecycleState.resumed && mounted) {
+      if (context.read<SettingsService>().minimalistMode) {
+        context.read<LauncherState>().setMinimalistActive(true);
+      }
+      context.read<UpdateService>().autoCheck();
     }
   }
 
@@ -203,6 +211,11 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                 ],
               )
             ))
+          ),
+          // A newer version is available: Update, Ignore or Never show updates.
+          Consumer2<UpdateService, LauncherState>(
+            builder: (_, update, launcher, __) =>
+                update.bannerVisible && !launcher.minimalistHidden ? const UpdateBanner() : const SizedBox.shrink(),
           ),
           // First run (or "Choose favorite apps" in the settings): pick the apps for the home screen.
           Consumer<AppsService>(

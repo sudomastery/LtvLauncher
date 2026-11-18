@@ -705,6 +705,120 @@ abstract class AppLocalizations {
   /// **'Minimalist mode: only the wallpaper until you press an arrow key (hides again after 1 minute)'**
   String get minimalistMode;
 
+  /// No description provided for @updates.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get updates;
+
+  /// No description provided for @updatesCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates'**
+  String get updatesCheck;
+
+  /// No description provided for @updatesInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Download and install'**
+  String get updatesInstall;
+
+  /// No description provided for @updatesChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking GitHub...'**
+  String get updatesChecking;
+
+  /// No description provided for @updatesUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'You are up to date.'**
+  String get updatesUpToDate;
+
+  /// No description provided for @updatesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Update available'**
+  String get updatesAvailable;
+
+  /// No description provided for @updatesDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading'**
+  String get updatesDownloading;
+
+  /// No description provided for @updatesInstalling.
+  ///
+  /// In en, this message translates to:
+  /// **'Installing. The launcher restarts when it is done.'**
+  String get updatesInstalling;
+
+  /// No description provided for @updatesInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed.'**
+  String get updatesInstalled;
+
+  /// No description provided for @updatesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update'**
+  String get updatesFailed;
+
+  /// No description provided for @updatesInstalledVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed version'**
+  String get updatesInstalledVersion;
+
+  /// No description provided for @updatesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Looks for a newer release of LTvLauncher Enhanced on GitHub. Nothing is sent except the request itself.'**
+  String get updatesHint;
+
+  /// No description provided for @updatesAdbHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Installing needs Network debugging turned on and allowed for this launcher (see Optimizations).'**
+  String get updatesAdbHint;
+
+  /// No description provided for @updatesUpdateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get updatesUpdateNow;
+
+  /// No description provided for @updatesIgnore.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore'**
+  String get updatesIgnore;
+
+  /// No description provided for @updatesNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Never show updates'**
+  String get updatesNever;
+
+  /// No description provided for @updatesClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get updatesClose;
+
+  /// No description provided for @updatesRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get updatesRetry;
+
+  /// No description provided for @updatesShowBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me when an update is available (checks once a day)'**
+  String get updatesShowBanner;
+
   /// No description provided for @wallpaperSlideshowInterval.
   ///
   /// In en, this message translates to:

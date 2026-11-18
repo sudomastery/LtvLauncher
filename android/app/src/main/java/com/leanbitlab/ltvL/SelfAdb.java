@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +32,8 @@ import dadb.Dadb;
  *
  * Safety: only fixed commands are ever sent. Enabling or disabling is limited to the packages in
  * {@link #ALLOWED_PACKAGES}. Force closing is limited to apps that have a launcher icon and are not
- * protected (see {@link #isProtected}). Nothing else can be run through this class.
+ * protected (see {@link #isProtected}). Updating is limited to an APK inside this app's own update folder
+ * whose SHA-256 matches. Nothing else can be run through this class.
  */
 final class SelfAdb {
     private static final String HOST = "127.0.0.1";
@@ -172,6 +176,61 @@ final class SelfAdb {
             out.put("ok", true);
             out.put("message", "");
         } catch (Exception e) {
+            out.put("ok", false);
+            out.put("message", e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage()));
+        }
+        return out;
+    }
+
+    // ----- Self update -----
+
+    /** The only folder an update APK may be installed from (inside this app's own external files folder). */
+    static File updateDirectory(Context context) {
+        File base = context.getExternalFilesDir(null);
+        return new File(base, "update");
+    }
+
+    static String sha256(File file) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        try (InputStream in = new FileInputStream(file)) {
+            byte[] buffer = new byte[64 * 1024];
+            int read;
+            while ((read = in.read(buffer)) > 0) digest.update(buffer, 0, read);
+        }
+        StringBuilder hex = new StringBuilder();
+        for (byte b : digest.digest()) hex.append(String.format("%02x", b));
+        return hex.toString();
+    }
+
+    /**
+     * Installs a downloaded update over the running app ("pm install -r"). Android itself refuses the APK
+     * unless it is signed with the same key as the installed app, so only releases signed by the owner apply.
+     * The file must sit in the update folder, be a .apk, and match {@code expectedSha256}.
+     */
+    static Map<String, Object> installUpdate(Context context, String path, String expectedSha256) {
+        Map<String, Object> out = new HashMap<>();
+        try {
+            File apk = new File(path).getCanonicalFile();
+            File folder = updateDirectory(context).getCanonicalFile();
+            if (!apk.getPath().startsWith(folder.getPath() + File.separator)
+                    || !apk.getName().endsWith(".apk") || !apk.isFile()) {
+                out.put("ok", false);
+                out.put("message", "The update file is not where it should be.");
+                return out;
+            }
+            if (expectedSha256 == null || !sha256(apk).equalsIgnoreCase(expectedSha256.trim())) {
+                out.put("ok", false);
+                out.put("message", "The downloaded update does not match its checksum.");
+                return out;
+            }
+            try (Dadb dadb = connect(context)) {
+                AdbShellResponse response = dadb.shell("pm install -r \"" + apk.getPath() + "\"");
+                String text = response.getAllOutput().trim();
+                out.put("ok", response.getExitCode() == 0 && text.contains("Success"));
+                out.put("message", text);
+            }
+        } catch (Exception e) {
+            // The old process is replaced while "pm install" runs, so a dropped connection can be a success.
             out.put("ok", false);
             out.put("message", e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage()));
         }

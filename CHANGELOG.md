@@ -19,6 +19,7 @@
 * Minimalist mode (Settings, Interface, Miscellaneous): only the wallpaper until an arrow key is pressed; the controls hide again after a minute.
 * Four built-in wallpapers are used until the user adds pictures or picks a gradient, so a fresh install is not black.
 * Results of Force close and Optimize mode show in a small themed pill in the top right.
+* Updates: the launcher checks GitHub once a day and offers a banner (Update, Ignore, Never show updates); Settings, Updates checks and installs by hand. Releases are built and signed by a tag-triggered GitHub Actions workflow or by `scripts/release.sh`.
 * HDMI input shortcuts under the settings icons, an Optimizations menu (keep the Play Store off), and Force close and Optimize mode in the app options menu. These use the TV's own network debugging through a small allow-listed helper (`SelfAdb.java`).
 
 ### Removals

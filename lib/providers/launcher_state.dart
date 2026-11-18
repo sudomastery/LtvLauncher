@@ -26,6 +26,7 @@ import 'package:provider/provider.dart';
 
 import '../widgets/settings/back_button_actions.dart';
 import 'apps_service.dart';
+import 'update_service.dart';
 
 class LauncherState extends ChangeNotifier
 {
@@ -131,6 +132,15 @@ class LauncherState extends ChangeNotifier
     if (_allAppsOpen) {
       setAllAppsOpen(false);
       return;
+    }
+    try {
+      final update = context.read<UpdateService>();
+      if (update.bannerVisible) {
+        update.dismissForNow();
+        return;
+      }
+    } catch (_) {
+      // No update service in this context (some tests): nothing to dismiss.
     }
     final apps = context.read<AppsService>();
     if (apps.onboardingActive) {

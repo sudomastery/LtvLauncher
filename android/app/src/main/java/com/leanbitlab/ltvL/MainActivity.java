@@ -211,6 +211,21 @@ public class MainActivity extends FlutterActivity {
                         runOnUiThread(() -> result.success(outcome));
                     });
                 }
+                case "getSupportedAbis" -> result.success(new ArrayList<>(java.util.Arrays.asList(Build.SUPPORTED_ABIS)));
+                case "getUpdateDirectory" -> {
+                    java.io.File folder = SelfAdb.updateDirectory(getApplicationContext());
+                    //noinspection ResultOfMethodCallIgnored
+                    folder.mkdirs();
+                    result.success(folder.getAbsolutePath());
+                }
+                case "installUpdate" -> {
+                    final String apkPath = call.argument("path");
+                    final String apkSha = call.argument("sha256");
+                    sIoExecutor.execute(() -> {
+                        final Map<String, Object> outcome = SelfAdb.installUpdate(getApplicationContext(), apkPath, apkSha);
+                        runOnUiThread(() -> result.success(outcome));
+                    });
+                }
                 case "isPackageEnabled" -> result.success(isPackageEnabled(call.arguments()));
                 case "setPackageEnabled" -> {
                     final String targetPackage = call.argument("packageName");

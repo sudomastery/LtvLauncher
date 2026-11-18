@@ -46,6 +46,9 @@ const String _screensaverClockStyleKey = "screensaver_clock_style";
 const String _screensaverAnimationStyleKey = "screensaver_animation_style";
 const String _timeBasedWallpaperEnabledKey = "time_based_wallpaper_enabled";
 const String _showInputShortcutsKey = "show_input_shortcuts";
+const String _updateChecksEnabledKey = "update_checks_enabled";
+const String _ignoredUpdateVersionKey = "ignored_update_version";
+const String _lastUpdateCheckKey = "last_update_check_millis";
 const String _minimalistModeKey = "minimalist_mode";
 const String _showcaseLayoutKey = "showcase_layout";
 const String _wallpaperSlideshowEnabledKey = "wallpaper_slideshow_enabled";
@@ -128,6 +131,9 @@ class SettingsService extends ChangeNotifier {
   late String _screensaverAnimationStyle;
   late bool _timeBasedWallpaperEnabled;
   late bool _showInputShortcuts;
+  late bool _updateChecksEnabled;
+  late String? _ignoredUpdateVersion;
+  late int _lastUpdateCheckMillis;
   late bool _minimalistMode;
   late bool _showcaseLayout;
   late bool _wallpaperSlideshowEnabled;
@@ -257,6 +263,9 @@ class SettingsService extends ChangeNotifier {
     _screensaverAnimationStyle = _sharedPreferences.getString(_screensaverAnimationStyleKey) ?? SCREENSAVER_ANIMATION_BOUNCE;
     _timeBasedWallpaperEnabled = _sharedPreferences.getBool(_timeBasedWallpaperEnabledKey) ?? false;
     _showInputShortcuts = _sharedPreferences.getBool(_showInputShortcutsKey) ?? true;
+    _updateChecksEnabled = _sharedPreferences.getBool(_updateChecksEnabledKey) ?? true;
+    _ignoredUpdateVersion = _sharedPreferences.getString(_ignoredUpdateVersionKey);
+    _lastUpdateCheckMillis = _sharedPreferences.getInt(_lastUpdateCheckKey) ?? 0;
     _minimalistMode = _sharedPreferences.getBool(_minimalistModeKey) ?? false;
     _showcaseLayout = _sharedPreferences.getBool(_showcaseLayoutKey) ?? true;
     _wallpaperSlideshowEnabled = _sharedPreferences.getBool(_wallpaperSlideshowEnabledKey) ?? true;
@@ -309,6 +318,7 @@ class SettingsService extends ChangeNotifier {
       _screensaverAnimationStyleKey: _screensaverAnimationStyle,
       _timeBasedWallpaperEnabledKey: _timeBasedWallpaperEnabled,
       _showInputShortcutsKey: _showInputShortcuts,
+      _updateChecksEnabledKey: _updateChecksEnabled,
       _minimalistModeKey: _minimalistMode,
       _showcaseLayoutKey: _showcaseLayout,
       _wallpaperSlideshowEnabledKey: _wallpaperSlideshowEnabled,
@@ -490,6 +500,36 @@ class SettingsService extends ChangeNotifier {
     await _sharedPreferences.setBool(_showInputShortcutsKey, show);
     _showInputShortcuts = show;
     notifyListeners();
+  }
+
+  /// Look for updates by themselves (at most once a day) and show a banner when there is one.
+  bool get updateChecksEnabled => _updateChecksEnabled;
+
+  Future<void> setUpdateChecksEnabled(bool enabled) async {
+    await _sharedPreferences.setBool(_updateChecksEnabledKey, enabled);
+    _updateChecksEnabled = enabled;
+    notifyListeners();
+  }
+
+  /// The version the user chose to ignore; a newer version is announced again.
+  String? get ignoredUpdateVersion => _ignoredUpdateVersion;
+
+  Future<void> setIgnoredUpdateVersion(String? version) async {
+    if (version == null) {
+      await _sharedPreferences.remove(_ignoredUpdateVersionKey);
+    } else {
+      await _sharedPreferences.setString(_ignoredUpdateVersionKey, version);
+    }
+    _ignoredUpdateVersion = version;
+    notifyListeners();
+  }
+
+  /// When the automatic update check last ran (milliseconds since the epoch, 0 when never).
+  int get lastUpdateCheckMillis => _lastUpdateCheckMillis;
+
+  Future<void> setLastUpdateCheckMillis(int millis) async {
+    await _sharedPreferences.setInt(_lastUpdateCheckKey, millis);
+    _lastUpdateCheckMillis = millis;
   }
 
   /// Only the wallpaper is shown; the controls appear on a directional key press and hide again after a minute.

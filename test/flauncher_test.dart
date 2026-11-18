@@ -23,6 +23,7 @@ import 'package:flauncher/gradients.dart';
 import 'package:flauncher/providers/apps_service.dart';
 import 'package:flauncher/models/category.dart';
 import 'package:flauncher/providers/launcher_state.dart';
+import 'package:flauncher/providers/update_service.dart';
 import 'package:flauncher/providers/network_service.dart';
 import 'package:flauncher/providers/settings_service.dart';
 import 'package:flauncher/providers/tv_inputs_service.dart';
@@ -811,6 +812,7 @@ Future<void> _pumpWidgetWithProviders(
         ChangeNotifierProvider<WatchNextService>.value(value: mkWatchNextService()),
         ChangeNotifierProvider<WeatherService>.value(value: mkWeatherService()),
         ChangeNotifierProvider(create: (_) => LauncherState()),
+        ChangeNotifierProvider<UpdateService>.value(value: UpdateService(MockFLauncherChannel())),
         ChangeNotifierProvider(create: (_) => NetworkService(FLauncherChannel())),
       ],
       builder: (_, __) => MaterialApp(

@@ -39,6 +39,7 @@ Screenshots use wallpapers generated for this README.
 | **Branding** | Purple logo | **Orange logo and banner**, installs as a separate app next to the original |
 | **Minimalist mode** | n/a | Optional: only the wallpaper shows, the controls appear on an arrow key press and fade away after a minute |
 | **Messages** | n/a | Small themed pill in the top right that fades after 2 seconds |
+| **Updates** | Reinstall by hand | Checks GitHub once a day and shows a banner with **Update**, **Ignore** and **Never show updates**; installs silently over the existing app |
 | **Donate menu** | Support and Donate entry with QR codes | Removed (and the QR code library with it) |
 | **Tests** | Existing suite | Existing suite plus new tests for the slideshow, showcase layout, favorites, HDMI chips and Optimizations |
 
@@ -145,6 +146,34 @@ For comparison, on the same TV Projectivy Launcher used roughly 39% of one core 
 - **Dependencies**: `dadb` added (ADB client for the Optimizations menu); `qr_flutter` removed along with the Donate dialog.
 - **Settings**: new switches for the showcase layout and the HDMI shortcuts, a slideshow switch and interval, and the Optimizations page. All new text is in the English strings and falls back to English in the other languages until translated.
 - **Build**: the `.fork` application id suffix is the default, with an override. APKs are named `LTvLauncher-Enhanced-<abi>`.
+
+## Updates
+
+The launcher looks for a newer release of itself on GitHub at most once a day. When there is one, a small banner appears at the top of the home screen:
+
+- **Update** downloads the right APK for your TV, checks its SHA-256 against the published checksum, and installs it over the existing app. The launcher restarts into the new version.
+- **Ignore** hides the banner for that version (the next release is announced again).
+- **Never show updates** turns the banner and the automatic check off. Settings, **Updates** still lets you check and install by hand, and has a switch to turn the banner back on.
+- **Back** hides the banner until the next start.
+
+Installing needs the same Network debugging approval as the Optimizations menu, and Android only accepts an update signed with the **same key** as the installed app, so a file from anywhere else cannot replace it. The only network request the launcher makes is to `api.github.com` for the release list and `github.com` for the APK; turning the banner off stops the daily check. (The original LTvLauncher makes no network requests at all.)
+
+### Publishing an update
+
+Push a tag and GitHub Actions does the rest ([`release.yml`](.github/workflows/release.yml)): it runs the tests, builds signed 32-bit, 64-bit and universal APKs, writes a `.sha256` file for each, and publishes them as a release.
+
+```sh
+git tag v2026.11.18 && git push origin v2026.11.18
+```
+
+The workflow needs four repository secrets, from the **same keystore** the installed apps were signed with (keep a backup of it: if it is lost, no installed copy can be updated):
+
+```sh
+base64 -w0 ~/.android/ltvl-fork.jks | gh secret set KEYSTORE_BASE64
+gh secret set KEYSTORE_PASSWORD   # then KEY_ALIAS and KEY_PASSWORD
+```
+
+If you would rather keep the key off GitHub, run the same build on your own computer with [`scripts/release.sh`](scripts/release.sh) (for example `scripts/release.sh 2026.11.18`). Use the script or the workflow for a given version, not both. Version numbers should go up (dates work well: `2026.11.18`, then `2026.11.18.1` for a second one the same day).
 
 ## Install
 

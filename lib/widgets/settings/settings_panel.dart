@@ -31,6 +31,7 @@ import 'package:flauncher/widgets/settings/app_details_page.dart';
 import 'package:flauncher/widgets/settings/accent_color_page.dart';
 import 'package:flauncher/widgets/settings/misc_panel_page.dart';
 import 'package:flauncher/widgets/settings/optimizations_page.dart';
+import 'package:flauncher/widgets/settings/updates_page.dart';
 import 'package:flauncher/widgets/settings/interface_settings_page.dart';
 import 'package:flauncher/widgets/settings/general_settings_page.dart';
 import 'package:flauncher/widgets/settings/screensaver_clock_style_page.dart';
@@ -98,6 +99,8 @@ class _SettingsPanelState extends State<SettingsPanel> {
                       return _FastPageRoute(builder: (_) => SettingsPanelPage());
                     case GeneralSettingsPage.routeName:
                       return _FastPageRoute(builder: (_) => GeneralSettingsPage());
+                    case UpdatesPage.routeName:
+                      return _FastPageRoute(builder: (_) => const UpdatesPage());
                     case OptimizationsPage.routeName:
                       return _FastPageRoute(builder: (_) => const OptimizationsPage());
                     case InterfaceSettingsPage.routeName:

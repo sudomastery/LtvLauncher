@@ -67,6 +67,23 @@ class FLauncherChannel {
     return result ?? {'ok': false, 'message': 'No answer from the system.', 'closed': <String>[]};
   }
 
+  /// CPU architectures this device supports, best first (for example ["armeabi-v7a", "armeabi"]).
+  Future<List<String>> getSupportedAbis() async =>
+      (await _methodChannel.invokeListMethod<String>('getSupportedAbis')) ?? const <String>[];
+
+  /// The folder update APKs are downloaded to (the only place [installUpdate] accepts a file from).
+  Future<String> getUpdateDirectory() async =>
+      (await _methodChannel.invokeMethod<String>('getUpdateDirectory')) ?? '';
+
+  /// Installs a downloaded update over the running app. Returns {ok: bool, message: String}.
+  Future<Map<String, dynamic>> installUpdate(String path, String sha256) async {
+    final result = await _methodChannel.invokeMapMethod<String, dynamic>(
+      'installUpdate',
+      {'path': path, 'sha256': sha256},
+    );
+    return result ?? {'ok': false, 'message': 'No answer from the system.'};
+  }
+
   /// True when the package is installed and enabled.
   Future<bool> isPackageEnabled(String packageName) async =>
       await _methodChannel.invokeMethod<bool>('isPackageEnabled', packageName) ?? false;

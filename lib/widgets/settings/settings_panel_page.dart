@@ -24,6 +24,7 @@ import 'package:flauncher/widgets/settings/interface_settings_page.dart';
 import 'package:flauncher/widgets/settings/display_settings_page.dart';
 import 'package:flauncher/widgets/settings/notifications_settings_page.dart';
 import 'package:flauncher/widgets/settings/optimizations_page.dart';
+import 'package:flauncher/widgets/settings/updates_page.dart';
 import 'package:flauncher/widgets/settings/general_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -83,6 +84,11 @@ class SettingsPanelPage extends StatelessWidget {
                     Navigator.of(context, rootNavigator: true).pop();
                     apps.restartOnboarding();
                   },
+                ),
+                FocusableSettingsTile(
+                  leading: const Icon(Icons.system_update),
+                  title: Text(localizations.updates, style: Theme.of(context).textTheme.bodyMedium),
+                  onPressed: () => Navigator.of(context).pushNamed(UpdatesPage.routeName),
                 ),
                 FocusableSettingsTile(
                   leading: const Icon(Icons.speed),

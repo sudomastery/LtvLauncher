@@ -308,6 +308,63 @@ class AppLocalizationsEs extends AppLocalizations {
   String get minimalistMode => 'Minimalist mode: only the wallpaper until you press an arrow key (hides again after 1 minute)';
 
   @override
+  String get updates => 'Updates';
+
+  @override
+  String get updatesCheck => 'Check for updates';
+
+  @override
+  String get updatesInstall => 'Download and install';
+
+  @override
+  String get updatesChecking => 'Checking GitHub...';
+
+  @override
+  String get updatesUpToDate => 'You are up to date.';
+
+  @override
+  String get updatesAvailable => 'Update available';
+
+  @override
+  String get updatesDownloading => 'Downloading';
+
+  @override
+  String get updatesInstalling => 'Installing. The launcher restarts when it is done.';
+
+  @override
+  String get updatesInstalled => 'Installed.';
+
+  @override
+  String get updatesFailed => 'Could not update';
+
+  @override
+  String get updatesInstalledVersion => 'Installed version';
+
+  @override
+  String get updatesHint => 'Looks for a newer release of LTvLauncher Enhanced on GitHub. Nothing is sent except the request itself.';
+
+  @override
+  String get updatesAdbHint => 'Installing needs Network debugging turned on and allowed for this launcher (see Optimizations).';
+
+  @override
+  String get updatesUpdateNow => 'Update';
+
+  @override
+  String get updatesIgnore => 'Ignore';
+
+  @override
+  String get updatesNever => 'Never show updates';
+
+  @override
+  String get updatesClose => 'Close';
+
+  @override
+  String get updatesRetry => 'Try again';
+
+  @override
+  String get updatesShowBanner => 'Tell me when an update is available (checks once a day)';
+
+  @override
   String get wallpaperSlideshowInterval => 'Change picture every';
 
   @override
