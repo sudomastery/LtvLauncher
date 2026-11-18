@@ -27,6 +27,7 @@ import 'package:flauncher/widgets/category_row.dart';
 import 'package:flauncher/widgets/launcher_alternative_view.dart';
 import 'package:flauncher/widgets/focus_aware_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flauncher/widgets/continue_watching_row.dart';
 import 'package:flauncher/providers/watch_next_service.dart';
@@ -58,7 +59,7 @@ class _FLauncherState extends State<FLauncher> {
         children: [
           RepaintBoundary(
             child: Consumer<WallpaperService>(
-              builder: (_, wallpaperService, __) => _wallpaper(context, wallpaperService)
+              builder: (ctx, wallpaperService, __) => _wallpaper(ctx, wallpaperService, showcase: _showcaseActive(ctx))
             ),
           ),
           Consumer<LauncherState>(
@@ -77,6 +78,10 @@ class _FLauncherState extends State<FLauncher> {
                 child: Consumer<AppsService>(
                   builder: (context, appsService, _) {
                     if (appsService.initialized) {
+                      final showcaseFavorites = _showcaseFavorites(context, appsService);
+                      if (showcaseFavorites != null) {
+                        return _showcase(context, showcaseFavorites);
+                      }
                       return Selector<WatchNextService, bool>(
                         selector: (_, watchNext) => watchNext.programs.isNotEmpty,
                         builder: (context, hasContinuingPrograms, _) =>
@@ -117,6 +122,49 @@ class _FLauncherState extends State<FLauncher> {
       )
     ),
   );
+
+  /// The Favorites row when the showcase home screen should be shown, otherwise null.
+  Category? _showcaseFavorites(BuildContext context, AppsService appsService) {
+    final enabled = context.select<SettingsService, bool>((settings) => settings.showcaseLayout);
+    final allAppsOpen = context.select<LauncherState, bool>((state) => state.allAppsOpen);
+    if (!enabled || allAppsOpen) return null;
+    for (final section in appsService.launcherSections) {
+      if (section is Category && section.name.toLowerCase() == 'favorites' && section.applications.isNotEmpty) {
+        return section;
+      }
+    }
+    return null;
+  }
+
+  bool _showcaseActive(BuildContext context) =>
+      _showcaseFavorites(context, context.watch<AppsService>()) != null;
+
+  /// Wallpaper on show, one row of favorites along the bottom. Down opens the full apps view, Back returns.
+  Widget _showcase(BuildContext context, Category favorites) {
+    return Focus(
+      canRequestFocus: false,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.arrowDown) {
+          context.read<LauncherState>().setAllAppsOpen(true);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Column(
+        children: [
+          const Spacer(),
+          CategoryRow(
+            key: Key("showcase_${favorites.id}"),
+            category: favorites,
+            applications: favorites.applications,
+            isFirstSection: true,
+            showTitle: false,
+          ),
+          const SizedBox(height: 28),
+        ],
+      ),
+    );
+  }
 
   Widget _sections(
     List<LauncherSection> sections, {
@@ -187,16 +235,20 @@ class _FLauncherState extends State<FLauncher> {
     return Column(children: children);
   }
 
-  Widget _wallpaper(BuildContext context, WallpaperService wallpaperService) {
+  Widget _wallpaper(BuildContext context, WallpaperService wallpaperService, {bool showcase = false}) {
     Widget background;
     if (wallpaperService.wallpaper != null) {
       final physicalSize = MediaQuery.sizeOf(context);
-      background = Image(
-        image: wallpaperService.wallpaper!,
-        key: Key("background_${wallpaperService.version}"),
-        fit: BoxFit.cover,
-        height: physicalSize.height,
-        width: physicalSize.width
+      background = AnimatedSwitcher(
+        duration: const Duration(milliseconds: 700),
+        child: Image(
+          image: wallpaperService.wallpaper!,
+          key: Key("background_${wallpaperService.version}"),
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+          height: physicalSize.height,
+          width: physicalSize.width
+        ),
       );
     }
     else {
@@ -212,11 +264,20 @@ class _FLauncherState extends State<FLauncher> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.35),
-                Colors.black.withOpacity(0.15),
-                Colors.black.withOpacity(0.45),
-              ],
+              // Showcase keeps the picture bright and only darkens the bottom where the apps sit.
+              colors: showcase
+                  ? [
+                      Colors.black.withOpacity(0.10),
+                      Colors.black.withOpacity(0.0),
+                      Colors.black.withOpacity(0.0),
+                      Colors.black.withOpacity(0.70),
+                    ]
+                  : [
+                      Colors.black.withOpacity(0.35),
+                      Colors.black.withOpacity(0.15),
+                      Colors.black.withOpacity(0.45),
+                    ],
+              stops: showcase ? const [0.0, 0.25, 0.60, 1.0] : null,
             ),
           ),
         ),

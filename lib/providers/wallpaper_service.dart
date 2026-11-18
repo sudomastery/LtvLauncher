@@ -18,6 +18,8 @@
 
 import 'dart:io';
 import 'dart:async';
+import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flauncher/flauncher_channel.dart';
 import 'package:flauncher/gradients.dart';
@@ -26,7 +28,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-class WallpaperService extends ChangeNotifier {
+class WallpaperService extends ChangeNotifier with WidgetsBindingObserver {
   final FLauncherChannel _fLauncherChannel;
   final SettingsService _settingsService;
 
@@ -34,6 +36,22 @@ class WallpaperService extends ChangeNotifier {
   late File _wallpaperDayFile;
   late File _wallpaperNightFile;
   Timer? _timer;
+
+  // Slideshow: pictures are read from <app external files dir>/wallpapers.
+  static const _slideshowFolderName = "wallpapers";
+  static const _imageExtensions = {".jpg", ".jpeg", ".png", ".webp"};
+  Directory? _slideshowDirectory;
+  List<File> _slideshowFiles = [];
+  int _slideshowIndex = -1;
+  Timer? _slideshowTimer;
+  DateTime _lastSlideshowChange = DateTime.fromMillisecondsSinceEpoch(0);
+  bool _slideshowActive = false;
+  int _lastSlideshowMinutes = 0;
+  bool _lastSlideshowEnabled = false;
+  bool _initialized = false;
+
+  // Decoded size is capped at the display width so a 4K picture does not cost 4K of RAM.
+  final Map<String, ImageProvider> _providers = {};
 
   ImageProvider? _wallpaper;
   int _version = 0;
@@ -51,10 +69,17 @@ class WallpaperService extends ChangeNotifier {
     _wallpaper = null
   {
     _settingsService.addListener(_onSettingsChanged);
+    WidgetsBinding.instance.addObserver(this);
     _init();
   }
 
   bool _lastTimeBasedEnabled = false;
+
+  /// Folder the slideshow reads from, or null before it is known. Shown in the settings screen.
+  String? get slideshowFolderPath => _slideshowDirectory?.path;
+
+  /// Number of pictures found in the slideshow folder at the last refresh.
+  int get slideshowPictureCount => _slideshowFiles.length;
 
   void _onSettingsChanged() {
     final enabled = _settingsService.timeBasedWallpaperEnabled;
@@ -63,13 +88,159 @@ class WallpaperService extends ChangeNotifier {
       _updateTimerState();
       _updateWallpaper();
     }
+    if (!_initialized) return;
+    final slideshowEnabled = _settingsService.wallpaperSlideshowEnabled;
+    final minutes = _settingsService.wallpaperSlideshowMinutes;
+    if (slideshowEnabled != _lastSlideshowEnabled || minutes != _lastSlideshowMinutes) {
+      _lastSlideshowEnabled = slideshowEnabled;
+      _lastSlideshowMinutes = minutes;
+      _restartSlideshow(advanceNow: slideshowEnabled);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(ui.AppLifecycleState state) {
+    if (!_initialized) return;
+    // Only run the slideshow while the launcher is on screen: no timers or decoding while an app is in front.
+    if (state == ui.AppLifecycleState.resumed) {
+      if (_settingsService.wallpaperSlideshowEnabled) {
+        final due = DateTime.now().difference(_lastSlideshowChange) >=
+            Duration(minutes: _settingsService.wallpaperSlideshowMinutes);
+        _restartSlideshow(advanceNow: due);
+      }
+    } else if (state == ui.AppLifecycleState.paused || state == ui.AppLifecycleState.hidden) {
+      _slideshowTimer?.cancel();
+      _slideshowTimer = null;
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _settingsService.removeListener(_onSettingsChanged);
     _timer?.cancel();
+    _slideshowTimer?.cancel();
     super.dispose();
+  }
+
+  int get _decodeWidth {
+    try {
+      final physical = ui.PlatformDispatcher.instance.views.first.physicalSize.width;
+      return min(physical.round(), 1920);
+    } catch (_) {
+      return 1280;
+    }
+  }
+
+  /// One provider instance per file, decoded no wider than the screen.
+  ImageProvider _providerFor(File file) {
+    return _providers.putIfAbsent(
+      file.path,
+      () => ResizeImage(FileImage(file), width: _decodeWidth, allowUpscaling: false),
+    );
+  }
+
+  Future<void> _forget(File file) async {
+    final old = _providers.remove(file.path);
+    await old?.evict();
+    await FileImage(file).evict();
+  }
+
+  Future<void> _preload(ImageProvider provider) {
+    final completer = Completer<void>();
+    final stream = provider.resolve(ImageConfiguration.empty);
+    late final ImageStreamListener listener;
+    listener = ImageStreamListener(
+      (_, __) {
+        if (!completer.isCompleted) completer.complete();
+        stream.removeListener(listener);
+      },
+      onError: (_, __) {
+        if (!completer.isCompleted) completer.complete();
+        stream.removeListener(listener);
+      },
+    );
+    stream.addListener(listener);
+    return completer.future.timeout(const Duration(seconds: 20), onTimeout: () {});
+  }
+
+  Future<void> _refreshSlideshowFiles() async {
+    final directory = _slideshowDirectory;
+    if (directory == null) return;
+    try {
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      final files = <File>[];
+      await for (final entity in directory.list(followLinks: false)) {
+        if (entity is File && _imageExtensions.contains(_extensionOf(entity.path))) {
+          files.add(entity);
+        }
+      }
+      files.sort((a, b) => a.path.compareTo(b.path));
+      files.shuffle(Random());
+      _slideshowFiles = files;
+      _slideshowIndex = -1;
+    } catch (_) {
+      _slideshowFiles = [];
+    }
+  }
+
+  String _extensionOf(String path) {
+    final dot = path.lastIndexOf('.');
+    return dot < 0 ? '' : path.substring(dot).toLowerCase();
+  }
+
+  /// Re-reads the slideshow folder and shows the next picture (used by the settings screen).
+  Future<void> rescanSlideshow() => _restartSlideshow(advanceNow: true);
+
+  /// (Re)starts the slideshow timer and optionally shows the next picture immediately.
+  Future<void> _restartSlideshow({required bool advanceNow}) async {
+    _slideshowTimer?.cancel();
+    _slideshowTimer = null;
+    final enabled = _settingsService.wallpaperSlideshowEnabled;
+    _slideshowActive = false;
+    if (!enabled) {
+      _lastSlideshowEnabled = false;
+      _slideshowFiles = [];
+      _providers.clear();
+      await _updateWallpaper(force: true);
+      return;
+    }
+    if (_slideshowDirectory == null) {
+      await _updateWallpaper(force: true);
+      return;
+    }
+    await _refreshSlideshowFiles();
+    if (_slideshowFiles.isEmpty) {
+      await _updateWallpaper(force: true);
+      return;
+    }
+    _slideshowActive = true;
+    _slideshowTimer = Timer.periodic(
+      Duration(minutes: _settingsService.wallpaperSlideshowMinutes),
+      (_) => _advanceSlideshow(),
+    );
+    if (advanceNow || _wallpaper == null) {
+      await _advanceSlideshow();
+    }
+  }
+
+  Future<void> _advanceSlideshow() async {
+    if (_slideshowFiles.isEmpty) return;
+    final previous = _slideshowIndex >= 0 && _slideshowIndex < _slideshowFiles.length ? _slideshowFiles[_slideshowIndex] : null;
+    _slideshowIndex = (_slideshowIndex + 1) % _slideshowFiles.length;
+    final next = _slideshowFiles[_slideshowIndex];
+    final provider = _providerFor(next);
+    await _preload(provider);
+    _lastSlideshowChange = DateTime.now();
+    _wallpaper = provider;
+    _version++;
+    notifyListeners();
+    if (previous != null && previous.path != next.path) {
+      // Keep at most the current picture decoded in memory.
+      await _forget(previous);
+    }
   }
 
   Future<void> _init() async {
@@ -77,9 +248,28 @@ class WallpaperService extends ChangeNotifier {
     _wallpaperFile = File("${directory.path}/wallpaper");
     _wallpaperDayFile = File("${directory.path}/wallpaper_day");
     _wallpaperNightFile = File("${directory.path}/wallpaper_night");
+    _initialized = true;
+
+    try {
+      final external = await getExternalStorageDirectory();
+      if (external != null) {
+        _slideshowDirectory = Directory("${external.path}/$_slideshowFolderName");
+        if (!await _slideshowDirectory!.exists()) {
+          await _slideshowDirectory!.create(recursive: true);
+        }
+      }
+    } catch (_) {
+      _slideshowDirectory = null;
+    }
 
     _lastTimeBasedEnabled = _settingsService.timeBasedWallpaperEnabled;
-    await _updateWallpaper();
+    _lastSlideshowEnabled = _settingsService.wallpaperSlideshowEnabled;
+    _lastSlideshowMinutes = _settingsService.wallpaperSlideshowMinutes;
+    if (_lastSlideshowEnabled) {
+      await _restartSlideshow(advanceNow: true);
+    } else {
+      await _updateWallpaper();
+    }
     _updateTimerState();
   }
 
@@ -101,17 +291,22 @@ class WallpaperService extends ChangeNotifier {
 
     ImageProvider? newWallpaper;
 
+    if (_slideshowActive && _slideshowIndex >= 0 && _slideshowIndex < _slideshowFiles.length) {
+      // The slideshow owns the wallpaper while it is running; _advanceSlideshow sets it.
+      return;
+    }
+
     if (enabled) {
       if (isDay && await _wallpaperDayFile.exists()) {
-        newWallpaper = FileImage(_wallpaperDayFile);
+        newWallpaper = _providerFor(_wallpaperDayFile);
       } else if (!isDay && await _wallpaperNightFile.exists()) {
-        newWallpaper = FileImage(_wallpaperNightFile);
+        newWallpaper = _providerFor(_wallpaperNightFile);
       } else if (await _wallpaperFile.exists()) {
-        newWallpaper = FileImage(_wallpaperFile); // Fallback
+        newWallpaper = _providerFor(_wallpaperFile); // Fallback
       }
     } else {
       if (await _wallpaperFile.exists()) {
-        newWallpaper = FileImage(_wallpaperFile);
+        newWallpaper = _providerFor(_wallpaperFile);
       }
     }
 
@@ -149,7 +344,7 @@ class WallpaperService extends ChangeNotifier {
       await readStream.cast<List<int>>().pipe(writeStream);
 
       // Evict from cache to ensure UI updates
-      await FileImage(targetFile).evict();
+      await _forget(targetFile);
 
       _version++;
       await _updateWallpaper(force: true);

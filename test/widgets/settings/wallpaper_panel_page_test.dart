@@ -83,6 +83,8 @@ Future<void> _pumpWidgetWithProviders(
   WallpaperService wallpaperService,
 ) async {
   when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
+  when(settingsService.wallpaperSlideshowEnabled).thenReturn(false);
+  when(settingsService.wallpaperSlideshowMinutes).thenReturn(15);
   await tester.pumpWidget(
     MultiProvider(
       providers: [

@@ -11,6 +11,11 @@
 * Map "Escape" key to the "Back" action.
 * Translate to Spanish.
 
+* Wallpaper slideshow: pictures in `Android/data/<app id>/files/wallpapers` rotate every 1 minute to 24 hours (default 15 minutes), only while the launcher is on screen. Wallpapers are decoded at the screen width, so a 4K picture does not cost 4K of RAM.
+* Showcase home screen (default): the wallpaper fills the screen with one row of Favorites along the bottom. Down opens the full apps view, Back returns.
+* Default Favorites: TizenTube, Plex, Prime Video, Netflix, Spotify and Twitch appear in that order when installed, and are added later if installed later.
+* Glow is the default card theme.
+
 ### Removals
 * Firebase analytics and crashlytics services.
 * Unsplash integration.

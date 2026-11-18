@@ -579,6 +579,36 @@ abstract class AppLocalizations {
   /// **'Pick night wallpaper'**
   String get pickNightWallpaper;
 
+  /// No description provided for @wallpaperSlideshow.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallpaper slideshow'**
+  String get wallpaperSlideshow;
+
+  /// No description provided for @showcaseLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Showcase home screen (wallpaper with one row of apps)'**
+  String get showcaseLayout;
+
+  /// No description provided for @wallpaperSlideshowInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Change picture every'**
+  String get wallpaperSlideshowInterval;
+
+  /// No description provided for @wallpaperSlideshowFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Pictures folder (press to rescan)'**
+  String get wallpaperSlideshowFolder;
+
+  /// No description provided for @wallpaperSlideshowEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No pictures found. Copy .jpg, .png or .webp files into this folder, then press to rescan.'**
+  String get wallpaperSlideshowEmpty;
+
   /// No description provided for @accessibility.
   ///
   /// In en, this message translates to:

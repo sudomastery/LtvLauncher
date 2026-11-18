@@ -102,6 +102,7 @@ class AppsService extends ChangeNotifier {
     } else {
       await _ensureTvAppsSectionOrder();
     }
+    await _seedDefaultFavorites();
 
     _fLauncherChannel.addAppsChangedListener((event) async {
       String? changedPackageName;
@@ -138,6 +139,7 @@ class AppsService extends ChangeNotifier {
                     shouldNotifyListeners: false);
               }
             }
+            await _seedDefaultFavorites(onlyPackage: newApp.packageName);
           }
           break;
         case "PACKAGES_AVAILABLE":
@@ -243,6 +245,42 @@ class AppsService extends ChangeNotifier {
         hidden: const Value.absent());
   }
 
+  /// Apps shown in Favorites by default, in this order, when they are installed. Apps that are not
+  /// installed simply do not appear; they are added when they get installed later. Each package is
+  /// seeded only once, so removing one from Favorites stays removed.
+  static const List<String> defaultFavoritePackages = [
+    "io.gh.reisxd.tizentube.cobalt", // TizenTube
+    "com.plexapp.android", // Plex
+    "com.amazon.amazonvideo.livingroom", // Prime Video
+    "com.netflix.ninja", // Netflix
+    "com.spotify.tv.android", // Spotify
+    "tv.twitch.android.app", // Twitch
+  ];
+
+  static const String _seededFavoritesKey = "default_favorites_seeded_v1";
+
+  Future<void> _seedDefaultFavorites({String? onlyPackage}) async {
+    try {
+      final prefs = await _prefsAsync;
+      final seeded = (prefs.getStringList(_seededFavoritesKey) ?? <String>[]).toSet();
+      var changed = false;
+      for (final packageName in defaultFavoritePackages) {
+        if (onlyPackage != null && packageName != onlyPackage) continue;
+        if (seeded.contains(packageName)) continue;
+        final app = _applications[packageName];
+        if (app == null) continue; // not installed: nothing to show yet
+        await addToFavorites(app);
+        seeded.add(packageName);
+        changed = true;
+      }
+      if (changed) {
+        await prefs.setStringList(_seededFavoritesKey, seeded.toList());
+      }
+    } catch (_) {
+      // Seeding favorites is a convenience; never let it break the launcher's startup.
+    }
+  }
+
   Future<void> _initDefaultCategories() {
     final tvApplications = _applications.values
         .where((application) => application.sideloaded == false);
@@ -250,6 +288,9 @@ class AppsService extends ChangeNotifier {
         .where((application) => application.sideloaded == true);
 
     return _database.transaction(() async {
+      // Favorites goes on top, like a typical TV home screen.
+      await addCategory("Favorites", rowHeight: 90, shouldNotifyListeners: false);
+
       int tvCategoryId = await addCategory("TV Apps",
           type: CategoryType.grid, shouldNotifyListeners: false);
       if (tvApplications.isNotEmpty) {
@@ -267,8 +308,6 @@ class AppsService extends ChangeNotifier {
         await addAllToCategory(nonTvApplications, nonTvAppsCategory,
             shouldNotifyListeners: false);
       }
-
-      await addCategory("Favorites", shouldNotifyListeners: false);
     });
   }
 

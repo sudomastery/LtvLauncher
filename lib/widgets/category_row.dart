@@ -33,11 +33,15 @@ class CategoryRow extends StatelessWidget
 
   final bool isFirstSection;
 
+  /// Forces the title off (used by the showcase home screen); null follows the user's setting.
+  final bool? showTitle;
+
   CategoryRow({
     Key? key,
     required this.category,
     required this.applications,
     this.isFirstSection = false,
+    this.showTitle,
   }) : super(key: key);
 
   @override
@@ -87,7 +91,7 @@ class CategoryRow extends StatelessWidget
               (service.showCategoryTitles, service.showCategoryAppCount),
           builder: (context, settings, _) {
             final (showCategoriesTitle, showCategoryAppCount) = settings;
-            if (showCategoriesTitle) {
+            if (showCategoriesTitle && showTitle != false) {
               return Padding(
                 padding: const EdgeInsets.only(left: 16, bottom: 8),
                 child: Row(

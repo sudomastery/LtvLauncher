@@ -31,9 +31,19 @@ class LauncherState extends ChangeNotifier
   bool _launcherVisible;
 
   DateTime? _suppressBackUntil;
+  bool _allAppsOpen = false;
 
   bool  get isDefaultLauncher => _isDefaultLauncher;
   bool  get launcherVisible => _launcherVisible;
+
+  /// True while the full apps view is open on top of the showcase home screen.
+  bool  get allAppsOpen => _allAppsOpen;
+
+  void setAllAppsOpen(bool open) {
+    if (_allAppsOpen == open) return;
+    _allAppsOpen = open;
+    notifyListeners();
+  }
 
   LauncherState() : _isDefaultLauncher = false, _launcherVisible = true;
 
@@ -52,6 +62,10 @@ class LauncherState extends ChangeNotifier
   }
 
   void handleBackNavigation(BuildContext context) {
+    if (_allAppsOpen) {
+      setAllAppsOpen(false);
+      return;
+    }
     if (_suppressBackUntil != null && DateTime.now().isBefore(_suppressBackUntil!)) {
       _suppressBackUntil = null;
       return;

@@ -584,10 +584,65 @@ void main() {
     await tester.pump();
     expect(isSettingsIconFocused(tester), isTrue);
   });
+
+  testWidgets("Showcase layout shows only the favorites row with the wallpaper behind", (tester) async {
+    final appsService = mkAppService();
+    final favorites = fakeCategory(name: "Favorites", order: 0, type: CategoryType.row);
+    final applications = fakeCategory(name: "Applications", order: 1);
+    favorites.applications.add(fakeApp(packageName: "me.efesser.fav", name: "Fav", version: "1.0.0"));
+    applications.applications.add(fakeApp(packageName: "me.efesser.other", name: "Other", version: "1.0.0"));
+    when(appsService.launcherSections).thenReturn([favorites, applications]);
+
+    await _pumpWidgetWithProviders(tester, mkWallpaperService(), appsService, mkSettingsService(showcase: true));
+
+    expect(find.byType(CategoryRow), findsOneWidget);
+    expect(find.byType(AppsGrid), findsNothing);
+    expect(find.byKey(Key("me.efesser.fav")), findsOneWidget);
+    expect(find.byKey(Key("me.efesser.other")), findsNothing);
+    expect(find.text("Favorites"), findsNothing);
+    expect(find.byType(Image), findsOneWidget);
+  });
+
+  testWidgets("Showcase: Down opens all apps and Back returns to the showcase", (tester) async {
+    final appsService = mkAppService();
+    final favorites = fakeCategory(name: "Favorites", order: 0, type: CategoryType.row);
+    final applications = fakeCategory(name: "Applications", order: 1);
+    favorites.applications.add(fakeApp(packageName: "me.efesser.fav", name: "Fav", version: "1.0.0"));
+    applications.applications.add(fakeApp(packageName: "me.efesser.other", name: "Other", version: "1.0.0"));
+    when(appsService.launcherSections).thenReturn([favorites, applications]);
+
+    await _pumpWidgetWithProviders(tester, mkWallpaperService(), appsService, mkSettingsService(showcase: true));
+    expect(find.byType(AppsGrid), findsNothing);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(find.byType(AppsGrid), findsOneWidget);
+    expect(find.byKey(Key("me.efesser.other")), findsOneWidget);
+
+    final context = tester.element(find.byType(FLauncher));
+    context.read<LauncherState>().handleBackNavigation(context);
+    await tester.pumpAndSettle();
+    expect(find.byType(AppsGrid), findsNothing);
+    expect(find.byKey(Key("me.efesser.fav")), findsOneWidget);
+  });
+
+  testWidgets("Showcase falls back to the full view when Favorites is empty", (tester) async {
+    final appsService = mkAppService();
+    final favorites = fakeCategory(name: "Favorites", order: 0, type: CategoryType.row);
+    final applications = fakeCategory(name: "Applications", order: 1);
+    applications.applications.add(fakeApp(packageName: "me.efesser.other", name: "Other", version: "1.0.0"));
+    when(appsService.launcherSections).thenReturn([favorites, applications]);
+
+    await _pumpWidgetWithProviders(tester, mkWallpaperService(), appsService, mkSettingsService(showcase: true));
+
+    expect(find.byType(AppsGrid), findsOneWidget);
+    expect(find.byKey(Key("me.efesser.other")), findsOneWidget);
+  });
 }
 
-SettingsService mkSettingsService() {
+SettingsService mkSettingsService({bool showcase = false}) {
   final settingsService = MockSettingsService();
+  when(settingsService.showcaseLayout).thenReturn(showcase);
   when(settingsService.dateFormat).thenReturn(SettingsService.defaultDateFormat);
   when(settingsService.timeFormat).thenReturn(SettingsService.defaultTimeFormat);
   when(settingsService.appHighlightAnimationEnabled).thenReturn(true);

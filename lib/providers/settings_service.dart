@@ -45,6 +45,9 @@ const String _accentColorKey = "accent_color";
 const String _screensaverClockStyleKey = "screensaver_clock_style";
 const String _screensaverAnimationStyleKey = "screensaver_animation_style";
 const String _timeBasedWallpaperEnabledKey = "time_based_wallpaper_enabled";
+const String _showcaseLayoutKey = "showcase_layout";
+const String _wallpaperSlideshowEnabledKey = "wallpaper_slideshow_enabled";
+const String _wallpaperSlideshowMinutesKey = "wallpaper_slideshow_minutes";
 const String _showInputsWidgetInStatusBarKey = "show_inputs_widget_in_status_bar";
 const String _showContinueWatchingKey = "show_continue_watching";
 const String _continueWatchingCardSizeKey = "continue_watching_card_size";
@@ -122,6 +125,9 @@ class SettingsService extends ChangeNotifier {
   late String _screensaverClockStyle;
   late String _screensaverAnimationStyle;
   late bool _timeBasedWallpaperEnabled;
+  late bool _showcaseLayout;
+  late bool _wallpaperSlideshowEnabled;
+  late int _wallpaperSlideshowMinutes;
   late bool _showInputsWidgetInStatusBar;
   late bool _showContinueWatching;
   late String _continueWatchingCardSize;
@@ -230,7 +236,7 @@ class SettingsService extends ChangeNotifier {
     _showCategoryTitles = _sharedPreferences.getBool(_showCategoryTitlesKey) ?? true;
     _showCategoryAppCount = _sharedPreferences.getBool(_showCategoryAppCountKey) ?? false;
     _showAppNamesBelowIcons = _sharedPreferences.getBool(_showAppNamesBelowIconsKey) ?? false;
-    _themes = _sharedPreferences.getString(_themesKey) ?? "modern";
+    _themes = _sharedPreferences.getString(_themesKey) ?? "glow";
     _hideHighlightOutlineOnHomescreen = _sharedPreferences.getBool(_hideHighlightOutlineOnHomescreenKey) ?? false;
     _appSelectorTransitionAnimationEnabled = _sharedPreferences.getBool(_appSelectorTransitionAnimationEnabledKey) ?? true;
     _showDateInStatusBar = _sharedPreferences.getBool(_showDateInStatusBarKey) ?? true;
@@ -246,6 +252,9 @@ class SettingsService extends ChangeNotifier {
     _screensaverClockStyle = _sharedPreferences.getString(_screensaverClockStyleKey) ?? "minimal";
     _screensaverAnimationStyle = _sharedPreferences.getString(_screensaverAnimationStyleKey) ?? SCREENSAVER_ANIMATION_BOUNCE;
     _timeBasedWallpaperEnabled = _sharedPreferences.getBool(_timeBasedWallpaperEnabledKey) ?? false;
+    _showcaseLayout = _sharedPreferences.getBool(_showcaseLayoutKey) ?? true;
+    _wallpaperSlideshowEnabled = _sharedPreferences.getBool(_wallpaperSlideshowEnabledKey) ?? true;
+    _wallpaperSlideshowMinutes = _sharedPreferences.getInt(_wallpaperSlideshowMinutesKey) ?? 15;
     _showInputsWidgetInStatusBar = _sharedPreferences.getBool(_showInputsWidgetInStatusBarKey) ?? true;
     _showContinueWatching = _sharedPreferences.getBool(_showContinueWatchingKey) ?? false;
     _continueWatchingCardSize = _sharedPreferences.getString(_continueWatchingCardSizeKey) ?? "normal";
@@ -293,6 +302,9 @@ class SettingsService extends ChangeNotifier {
       _screensaverClockStyleKey: _screensaverClockStyle,
       _screensaverAnimationStyleKey: _screensaverAnimationStyle,
       _timeBasedWallpaperEnabledKey: _timeBasedWallpaperEnabled,
+      _showcaseLayoutKey: _showcaseLayout,
+      _wallpaperSlideshowEnabledKey: _wallpaperSlideshowEnabled,
+      _wallpaperSlideshowMinutesKey: _wallpaperSlideshowMinutes,
       _showInputsWidgetInStatusBarKey: _showInputsWidgetInStatusBar,
       _showContinueWatchingKey: _showContinueWatching,
       _continueWatchingCardSizeKey: _continueWatchingCardSize,
@@ -460,6 +472,33 @@ class SettingsService extends ChangeNotifier {
   Future<void> setScreensaverAnimationStyle(String style) async {
     await _sharedPreferences.setString(_screensaverAnimationStyleKey, style);
     _screensaverAnimationStyle = style;
+    notifyListeners();
+  }
+
+  /// Home screen shows the wallpaper with a single row of Favorites along the bottom.
+  bool get showcaseLayout => _showcaseLayout;
+
+  Future<void> setShowcaseLayout(bool enabled) async {
+    await _sharedPreferences.setBool(_showcaseLayoutKey, enabled);
+    _showcaseLayout = enabled;
+    notifyListeners();
+  }
+
+  bool get wallpaperSlideshowEnabled => _wallpaperSlideshowEnabled;
+
+  Future<void> setWallpaperSlideshowEnabled(bool enabled) async {
+    await _sharedPreferences.setBool(_wallpaperSlideshowEnabledKey, enabled);
+    _wallpaperSlideshowEnabled = enabled;
+    notifyListeners();
+  }
+
+  /// Minutes between pictures in the wallpaper slideshow (1 to 1440).
+  int get wallpaperSlideshowMinutes => _wallpaperSlideshowMinutes;
+
+  Future<void> setWallpaperSlideshowMinutes(int minutes) async {
+    final value = minutes.clamp(1, 1440);
+    await _sharedPreferences.setInt(_wallpaperSlideshowMinutesKey, value);
+    _wallpaperSlideshowMinutes = value;
     notifyListeners();
   }
 

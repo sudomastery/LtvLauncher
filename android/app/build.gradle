@@ -69,6 +69,10 @@ android {
 
     defaultConfig {
         applicationId "com.leanbitlab.ltvL"
+        // Lets a test build install next to the original: ./gradlew ... -PappIdSuffix=.fork
+        if (project.hasProperty("appIdSuffix")) {
+            applicationIdSuffix project.property("appIdSuffix")
+        }
         compileSdk 35
         minSdk 21
         targetSdk 35

@@ -245,6 +245,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pickNightWallpaper => 'Elegir fondo de pantalla nocturno';
 
   @override
+  String get wallpaperSlideshow => 'Wallpaper slideshow';
+
+  @override
+  String get showcaseLayout => 'Showcase home screen (wallpaper with one row of apps)';
+
+  @override
+  String get wallpaperSlideshowInterval => 'Change picture every';
+
+  @override
+  String get wallpaperSlideshowFolder => 'Pictures folder (press to rescan)';
+
+  @override
+  String get wallpaperSlideshowEmpty => 'No pictures found. Copy .jpg, .png or .webp files into this folder, then press to rescan.';
+
+  @override
   String get accessibility => 'Accesibilidad';
 
   @override

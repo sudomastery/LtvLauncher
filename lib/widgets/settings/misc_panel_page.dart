@@ -42,6 +42,12 @@ class MiscPanelPage extends StatelessWidget {
             children: [
               RoundedSwitchListTile(
                 autofocus: true,
+                value: settingsService.showcaseLayout,
+                onChanged: (value) => settingsService.setShowcaseLayout(value),
+                title: Text(localizations.showcaseLayout, style: Theme.of(context).textTheme.bodyMedium),
+                secondary: const Icon(Icons.wallpaper),
+              ),
+              RoundedSwitchListTile(
                 value: settingsService.appHighlightAnimationEnabled,
                 onChanged: (value) => settingsService.setAppHighlightAnimationEnabled(value),
                 title: Text(localizations.appCardHighlightAnimation, style: Theme.of(context).textTheme.bodyMedium),

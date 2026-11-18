@@ -41,6 +41,46 @@ class WallpaperPanelPage extends StatelessWidget {
             builder: (_, settings, __) {
               return RoundedSwitchListTile(
                 autofocus: true,
+                title: Text(localizations.wallpaperSlideshow),
+                secondary: Icon(Icons.slideshow),
+                value: settings.wallpaperSlideshowEnabled,
+                onChanged: (value) => settings.setWallpaperSlideshowEnabled(value),
+              );
+            }
+          ),
+          Consumer<SettingsService>(
+            builder: (context, settings, __) {
+              if (!settings.wallpaperSlideshowEnabled) return SizedBox.shrink();
+              final wallpaper = context.watch<WallpaperService>();
+              final count = wallpaper.slideshowPictureCount;
+              final folder = wallpaper.slideshowFolderPath ?? "-";
+              return Column(
+                children: [
+                  FocusableSettingsTile(
+                    leading: Icon(Icons.timer_outlined),
+                    title: Text(localizations.wallpaperSlideshowInterval, style: Theme.of(context).textTheme.bodyMedium),
+                    trailing: Text(_intervalLabel(settings.wallpaperSlideshowMinutes)),
+                    onPressed: () => settings.setWallpaperSlideshowMinutes(_nextInterval(settings.wallpaperSlideshowMinutes)),
+                  ),
+                  FocusableSettingsTile(
+                    leading: Icon(Icons.folder_open),
+                    title: Text(
+                      count == 0 ? localizations.wallpaperSlideshowEmpty : "${localizations.wallpaperSlideshowFolder}: $count",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    onPressed: () => wallpaper.rescanSlideshow(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                    child: Text(folder, style: Theme.of(context).textTheme.bodySmall),
+                  ),
+                ],
+              );
+            }
+          ),
+          Consumer<SettingsService>(
+            builder: (_, settings, __) {
+              return RoundedSwitchListTile(
                 title: Text(localizations.timeBasedWallpaper),
                 secondary: Icon(Icons.access_time),
                 value: settings.timeBasedWallpaperEnabled,
@@ -86,6 +126,21 @@ class WallpaperPanelPage extends StatelessWidget {
           ),
         ],
     );
+  }
+
+  static const List<int> _intervals = [1, 5, 15, 30, 60, 180, 720, 1440];
+
+  static int _nextInterval(int current) {
+    for (final value in _intervals) {
+      if (value > current) return value;
+    }
+    return _intervals.first;
+  }
+
+  static String _intervalLabel(int minutes) {
+    if (minutes < 60) return "$minutes min";
+    if (minutes % 60 == 0) return "${minutes ~/ 60} h";
+    return "$minutes min";
   }
 
   Future<void> _pickWallpaper(BuildContext context, Future<void> Function(WallpaperService) action, AppLocalizations localizations) async {
